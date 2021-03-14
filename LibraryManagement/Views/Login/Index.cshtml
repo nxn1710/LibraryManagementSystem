@@ -1,0 +1,58 @@
+﻿@model LibraryManagement.Models.StaffAccount
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+
+    <title>@ViewBag.title</title>
+    @Styles.Render("~/Content/css/bootstrap.min.css")
+    @Styles.Render("~/Content/css/metisMenu.min.css")
+    @Styles.Render("~/Content/css/timeline.css")
+    @Styles.Render("~/Content/css/startmin.css")
+    @Styles.Render("~/Content/css/font-awesome.min.css")
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4">
+                <div class="login-panel panel panel-info">
+                    @if (ViewBag.error != null) {
+                        <div class="alert alert-danger" style="margin-bottom:0px;">
+                            <span>@ViewBag.error</span>
+                        </div>
+                    }
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Sign In to Library Management System</h3>
+                    </div>
+                    <div class="panel-body">
+                        @using (Html.BeginForm("Index", "Login", FormMethod.Post)) {
+                            @Html.AntiForgeryToken()
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.username, "", new { @class = "form-control", @placeholder = "Username" })
+                            </div>
+                            <div class="form-group">
+                                @Html.PasswordFor(m => m.password, new { @class = "form-control", @placeholder = "Password" })
+                            </div>
+                            <input class="btn btn-lg btn-success btn-block" type="submit" value="Login">
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Scripts.Render("~/Scripts/js/jquery.min.js")
+    @Scripts.Render("~/Scripts/js/bootstrap.min.js")
+    @Scripts.Render("~/Scripts/js/metisMenu.min.js")
+    @Scripts.Render("~/Scripts/js/raphael.min.js")
+    @Scripts.Render("~/Scripts/js/startmin.js")
+</body>
+</html>
