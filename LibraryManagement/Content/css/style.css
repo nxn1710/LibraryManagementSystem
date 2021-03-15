@@ -1,0 +1,27 @@
+﻿.mt-1 {
+    margin-top: 10px;
+}
+
+.mb-1 {
+    margin-bottom: 10px;
+}
+
+
+.m-1 {
+    margin: 10px;
+}
+
+.text-center {
+    text-align:center;
+}
+
+.pl-0 {
+    padding-left: 0;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+.p-1 {
+    padding: 10px;
+}

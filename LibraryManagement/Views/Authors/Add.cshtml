@@ -1,0 +1,26 @@
+﻿
+@model LibraryManagement.Models.Author
+<div class="row">
+    <div class="col-lg-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                Add author form
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        @using (Html.BeginForm("Add", "Authors", FormMethod.Post)) {
+                            @Html.AntiForgeryToken()
+                        <div class="form-group">
+                            @Html.LabelFor(a => a.author_name, "Author Name")
+                            @Html.TextBoxFor(a => a.author_name, null, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.author_name, null, new {  @class = "text-danger" })
+                        </div>
+                            <button type="submit" class="btn btn-primary">Add Button</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
