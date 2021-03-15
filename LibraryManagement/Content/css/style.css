@@ -14,3 +14,14 @@
 .text-center {
     text-align:center;
 }
+
+.pl-0 {
+    padding-left: 0;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+.p-1 {
+    padding: 10px;
+}

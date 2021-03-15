@@ -245,6 +245,7 @@
     <Content Include="Views\Login\Index.cshtml" />
     <Content Include="Views\Authors\Index.cshtml" />
     <Content Include="Views\Authors\Add.cshtml" />
+    <Content Include="Views\Authors\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

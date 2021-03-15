@@ -7,7 +7,7 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
 
-    <title>@ViewBag.title</title>
+    <title>Library Management - @ViewBag.title</title>
     @Styles.Render("~/Content/css/bootstrap.min.css")
     @Styles.Render("~/Content/css/metisMenu.min.css")
     @Styles.Render("~/Content/css/timeline.css")
@@ -156,6 +156,11 @@
         </nav>
         <div id="page-wrapper">
             <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h3 class="page-header">@ViewBag.title</h3>
+                    </div>
+                </div>
                 @RenderBody()
                 <footer>
                     <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>

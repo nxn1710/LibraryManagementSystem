@@ -8,6 +8,7 @@ namespace LibraryManagement.Controllers {
     public class HomeController : Controller {
         private LibraryEntities _db = new LibraryEntities();
         public ActionResult Index() {
+            ViewBag.Title = "Home Page";
             return View();
         }
     }
