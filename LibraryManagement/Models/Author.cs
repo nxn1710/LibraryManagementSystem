@@ -24,7 +24,7 @@ namespace LibraryManagement.Models
     
         public int id { get; set; }
 
-        [Required(AllowEmptyStrings =false, ErrorMessage ="Please enter a valid name")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid name")]
         [StringLength(64, MinimumLength = 3, ErrorMessage = "Please length of name must be from 3 to 64 characters")]
         public string author_name { get; set; }
     
