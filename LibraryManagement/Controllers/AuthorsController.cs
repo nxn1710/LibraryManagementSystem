@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Web;
@@ -10,11 +11,24 @@ namespace LibraryManagement.Controllers {
     public class AuthorsController : Controller {
         private LibraryEntities _db = new LibraryEntities();
         // GET: Authors
-        public ActionResult Index(int? page, string key) {
+        public ActionResult Index(int? page, string key, int? size) {
             ViewBag.title = "Authors";
+            List<SelectListItem> items = new List<SelectListItem>();
+            items.Add(new SelectListItem { Text = "5", Value = "5" });
+            items.Add(new SelectListItem { Text = "10", Value = "10" });
+            items.Add(new SelectListItem { Text = "20", Value = "20" });
+            items.Add(new SelectListItem { Text = "25", Value = "25" });
+            items.Add(new SelectListItem { Text = "50", Value = "50" });
+            items.Add(new SelectListItem { Text = "100", Value = "100" });
+            items.Add(new SelectListItem { Text = "200", Value = "200" });
+            foreach (var item in items) {
+                if (item.Value == size.ToString()) item.Selected = true;
+            }
+            ViewBag.currentSize = size;
+            ViewBag.size = items;
             if (page == null) page = 1;
             int pageNumber = (page ?? 1);
-            int pageSize = 6;
+            int pageSize = (size ?? 5);
             var authors = (from a in _db.Authors
                            select a).OrderBy(a => a.id);
             if (!String.IsNullOrEmpty(key)) {
