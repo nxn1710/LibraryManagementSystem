@@ -2,9 +2,9 @@
 @model LibraryManagement.Models.Author
 <div class="row">
     <div class="col-lg-6">
-        <div class="panel panel-primary">
+        <div class="panel panel-info">
             <div class="panel-heading">
-                Edit Author Form
+                Update Author ID @Model.id
             </div>
             <div class="panel-body">
                 <div class="row">
@@ -12,13 +12,12 @@
                         @using (Html.BeginForm("Edit", "Authors", FormMethod.Post)) {
                             @Html.AntiForgeryToken()
                         <div class="form-group">
-                            <p class="alert alert-warning">Update Author ID @Model.id</p>
                             @Html.HiddenFor(a => a.id)
                             @Html.LabelFor(a => a.author_name, "Author Name")
                             @Html.TextBoxFor(a => a.author_name, null, new { @class = "form-control" })
                             @Html.ValidationMessageFor(m => m.author_name, null, new { @class = "text-danger" })
                         </div>
-                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="submit" class="btn btn-info">Update</button>
                         }
                     </div>
                 </div>

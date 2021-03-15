@@ -25,3 +25,15 @@
 .p-1 {
     padding: 10px;
 }
+
+text-right {
+    text-align: right;
+}
+
+.pt-0 {
+    padding-top: 0;
+}
+
+.m-20 {
+    margin: 20px;
+}
