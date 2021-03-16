@@ -59,7 +59,7 @@
                                     <td> @author.author_name</td>
                                     <td>
                                         <a href="@Url.Action("Edit", "Authors", new {@author.id})" class="btn btn-primary"><i class="fa fa-pencil-square-o"></i> </a>
-                                        <a href="@Url.Action("Delete", "Authors", new {@author.id})" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+                                        <a href="@Url.Action("Delete", "Authors", new {@author.id})" onclick="deleteFunction(event, @author.id)" class="btn btn-danger"><i class="fa fa-trash"></i></a>
                                     </td>
                                 </tr>
                             }
@@ -94,3 +94,12 @@
     </div>
 
 </div>
+
+<script>
+    function deleteFunction(event, id) {
+        var result = confirm("Do you want to delete Author " + id + "?");
+        if (!result) {
+            event.preventDefault();
+        }
+    }
+</script>
