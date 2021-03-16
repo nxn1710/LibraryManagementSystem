@@ -7,7 +7,7 @@
             @TempData["message"]
         </p>
     }
-    <div class="col-sm-9 mb-1">
+    <div class="col-sm-7 mb-1">
         <form action="/Authors/Index" method="GET">
             <div class="col-sm-5 pl-0">
                 @Html.TextBox("key", null, new { @class = "form-control input-sm" })
@@ -21,19 +21,11 @@
                 </a>
             </div>
         </form>
-        @*@using (Html.BeginForm("Index", "Authors", FormMethod.Get)) {
-                <div class="col-sm-5 pl-0">
-                    @Html.TextBox("key", null, new { @class = "form-control input-sm" })
-                </div>
-                <div class="col-sm-7">
-                    <input class="btn btn-primary" type="submit" value="Search" />
-                    @Html.ActionLink("Clear", "Index", "Authors", null, new { @class = "btn btn-default" })
-                    <a href="@Url.Action("Add", "Authors")" class="btn btn-success">
-                        <i class="fa fa-plus"></i>
-                        Add New
-                    </a>
-                </div>
-            }*@
+    </div>
+    <div class="col-sm-5">
+        <form action="./Authors/Export" method="post">
+            <button type="submit" class="btn btn-info"><i class="fa fa-download" aria-hidden="true"></i> Export to excel</button>
+        </form>
     </div>
     <div class="col-lg-12">
         <div class="panel panel-default">

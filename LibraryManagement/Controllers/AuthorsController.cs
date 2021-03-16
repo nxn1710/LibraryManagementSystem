@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using ClosedXML.Excel;
 using LibraryManagement.Models;
 using PagedList;
 
@@ -91,6 +94,26 @@ namespace LibraryManagement.Controllers {
             _db.SaveChanges();
             TempData["message"] = $"Delete Author {id} - {author.author_name} successfully!";
             return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public FileResult Export() {
+            DataTable dt = new DataTable("Grid");
+            dt.Columns.AddRange(new DataColumn[2] { new DataColumn("Author ID"),
+                                            new DataColumn("Author Name") });
+            var authors = from a in _db.Authors
+                            select a;
+            foreach (var author in authors) {
+                dt.Rows.Add(author.id, author.author_name);
+            }
+            using (XLWorkbook wb = new XLWorkbook()) {
+                wb.Worksheets.Add(dt);
+                DateTime today = DateTime.Today;
+                using (MemoryStream stream = new MemoryStream()) {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Author {today.ToString("dd/MM/yyyy")}.xlsx");
+                }
+            }
         }
     }
 }
