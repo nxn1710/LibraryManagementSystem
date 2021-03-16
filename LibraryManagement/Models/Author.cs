@@ -11,7 +11,7 @@ namespace LibraryManagement.Models
 {
     using System;
     using System.Collections.Generic;
-    
+    using System.ComponentModel.DataAnnotations;
     public partial class Author
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
@@ -22,7 +22,10 @@ namespace LibraryManagement.Models
     
         public int id { get; set; }
         public string author_name { get; set; }
-    
+
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid name")]
+        [StringLength(64, MinimumLength = 3, ErrorMessage = "Please length of name must be from 3 to 64 characters")]
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Book> Books { get; set; }
     }
