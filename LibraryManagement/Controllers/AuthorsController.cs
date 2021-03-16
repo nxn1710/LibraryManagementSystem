@@ -96,11 +96,10 @@ namespace LibraryManagement.Controllers {
             return RedirectToAction("Index");
         }
 
-        [HttpPost]
         public FileResult Export() {
             DataTable dt = new DataTable("Grid");
-            dt.Columns.AddRange(new DataColumn[2] { new DataColumn("Author ID"),
-                                            new DataColumn("Author Name") });
+            dt.Columns.AddRange(new DataColumn[2] { new DataColumn("ID"),
+                                            new DataColumn("Name") });
             var authors = from a in _db.Authors
                             select a;
             foreach (var author in authors) {
