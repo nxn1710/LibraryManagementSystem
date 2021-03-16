@@ -14,17 +14,24 @@ namespace LibraryManagement.Models
     
     public partial class Borrowed
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public Borrowed()
+        {
+            this.BorrowedDetails = new HashSet<BorrowedDetail>();
+        }
+    
         public int id { get; set; }
         public int member_id { get; set; }
-        public int book_id { get; set; }
         public int staff_id { get; set; }
         public System.DateTime borrowed_time { get; set; }
         public System.DateTime return_deadline { get; set; }
         public bool @return { get; set; }
         public System.DateTime return_time { get; set; }
+        public float total_price { get; set; }
     
-        public virtual Book Book { get; set; }
         public virtual Member Member { get; set; }
         public virtual StaffAccount StaffAccount { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<BorrowedDetail> BorrowedDetails { get; set; }
     }
 }

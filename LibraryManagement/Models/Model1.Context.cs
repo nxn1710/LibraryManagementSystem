@@ -31,6 +31,7 @@ namespace LibraryManagement.Models
         public virtual DbSet<Book> Books { get; set; }
         public virtual DbSet<BookCategory> BookCategories { get; set; }
         public virtual DbSet<Borrowed> Borroweds { get; set; }
+        public virtual DbSet<BorrowedDetail> BorrowedDetails { get; set; }
         public virtual DbSet<Member> Members { get; set; }
         public virtual DbSet<StaffAccount> StaffAccounts { get; set; }
         public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
