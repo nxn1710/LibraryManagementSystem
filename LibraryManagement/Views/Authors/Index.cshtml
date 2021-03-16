@@ -84,18 +84,19 @@
 </div>
 
 <script>
-    function deleteFunction(id) {
+    function deleteFunction(event ,id) {
         var { origin } = window.location;
+        event.preventDefault();
         swal({
             title: "Do you want to delete Author " + id + "?",
             text: "",
             icon: "warning",
             buttons: true,
             dangerMode: true,
-        })
-            .then((willDelete) => {
+        }).then((willDelete) => {
                 if (willDelete) {
                     window.location = `${origin}/Authors/Delete/${id}`;
-                });
+                }
+         });
     }
 </script>

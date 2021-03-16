@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Entity;
+using System.Data.Entity.SqlServer;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using ClosedXML.Excel;
 using LibraryManagement.Models;
 using PagedList;
 
@@ -15,9 +19,20 @@ namespace LibraryManagement.Controllers
         // GET: Member
         [HttpGet]
 
-        public ActionResult Index(int? page, string key, int? size)
+        public ActionResult Index(int? page, string keySearch, string sortOrder, string currentFilter, string searchString, int? size)
         {
             ViewBag.title = "Members";
+            ViewBag.FullNameSortParm = String.IsNullOrEmpty(sortOrder) ? "fullname_desc" : "";
+            ViewBag.MemberID = String.IsNullOrEmpty(sortOrder) ? "id_desc" : "id_asc";
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+            ViewBag.CurrentFilter = searchString;
             List<SelectListItem> items = new List<SelectListItem>();
             items.Add(new SelectListItem { Text = "5", Value = "5" });
             items.Add(new SelectListItem { Text = "10", Value = "10" });
@@ -35,21 +50,36 @@ namespace LibraryManagement.Controllers
             if (page == null) page = 1;
             int pageNumber = (page ?? 1);
             int pageSize = (size ?? 5);
-            var members = (from m in _db.Members
-                           select m).OrderBy(m => m.id);
-            if (!String.IsNullOrEmpty(key))
+            var members = from m in _db.Members
+                           select m;
+            if (!String.IsNullOrEmpty(keySearch))
             {
-                members = members.Where(a => (a.id + " " + a.fullname).Contains(key)).OrderBy(a => a.id);
-                ViewBag.searchValue = key;
+                members = members.Where(a => (a.id + " " + a.fullname).Contains(keySearch)).OrderBy(a => a.id);
+                ViewBag.searchValue = keySearch;
+            }
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                members = members.Where(m => m.fullname.Contains(searchString) || SqlFunctions.StringConvert((double)m.id).Contains(searchString));
             }
             if (members.Count() == 0)
             {
                 TempData["message"] = $"Not found anything in system!";
                 TempData["error"] = true;
             }
+            
+            switch (sortOrder)
+            {
+                case "fullname_desc":
+                    members = members.OrderByDescending(m => m.fullname);
+                    break;
+                default:
+                    members = members.OrderBy(m => m.fullname);
+                    break;
+            }
+
+
             return View(members.ToPagedList(pageNumber, pageSize));
         }
-
         public ActionResult Add()
         {
             ViewBag.title = "Members - Add";
@@ -64,7 +94,7 @@ namespace LibraryManagement.Controllers
             {
                 _db.Members.Add(member);
                 _db.SaveChanges();
-                TempData["message"] = $"Add author successfully!";
+                TempData["message"] = $"Add member successfully!";
                 return RedirectToAction("Index", new { key = member.id + " " + member.fullname });
             }
             return View();
@@ -76,7 +106,7 @@ namespace LibraryManagement.Controllers
             var member = (from a in _db.Members where a.id == id select a).SingleOrDefault();
             if (id == null || member == null)
             {
-                TempData["message"] = $"Update fail, Cannot found that Author in system!";
+                TempData["message"] = $"Update fail, Cannot found that Members in system!";
                 TempData["error"] = true;
                 return RedirectToAction("Index");
             }
@@ -90,7 +120,7 @@ namespace LibraryManagement.Controllers
             {
                 _db.Entry(member).State = EntityState.Modified;
                 _db.SaveChanges();
-                TempData["message"] = $"Update author successfully!";
+                TempData["message"] = $"Update members successfully!";
                 return RedirectToAction("Index", new { key = member.id + " " + member.fullname });
             }
             return View(member);
@@ -101,7 +131,7 @@ namespace LibraryManagement.Controllers
             var member = (from a in _db.Members where a.id == id select a).SingleOrDefault();
             if (id == null || member == null)
             {
-                TempData["message"] = $"Delete fail, Cannot found that Author in system!";
+                TempData["message"] = $"Delete fail, Cannot found that Member in system!";
                 TempData["error"] = true;
                 return RedirectToAction("Index");
             }
@@ -110,6 +140,34 @@ namespace LibraryManagement.Controllers
             TempData["message"] = $"Delete Author {id} - {member.fullname} successfully!";
             return RedirectToAction("Index");
         }
+
+        public FileResult Export()
+        {
+            DataTable dt = new DataTable("Grid");
+            dt.Columns.AddRange(new DataColumn[4] { new DataColumn("ID"),
+                                                     new DataColumn("Full Name"),
+            new DataColumn("Phone Number"),
+            new DataColumn("Address"),
+            });
+            var members = from m in _db.Members
+                          select m;
+            foreach (var member in members)
+            {
+                dt.Rows.Add(member.id, member.fullname, member.phonenumber, member.address);
+            }
+            using (XLWorkbook wb = new XLWorkbook())
+            {
+                wb.Worksheets.Add(dt);
+                DateTime today = DateTime.Today;
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Member {today.ToString("dd/MM/yyyy")}.xlsx");
+                }
+            }
+        }
+
+
 
         //public ActionResult ShowAll(string fullname)
         //{
