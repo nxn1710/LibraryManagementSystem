@@ -9,13 +9,64 @@ using System.Web.Mvc;
 using ClosedXML.Excel;
 using LibraryManagement.Models;
 using PagedList;
+using System.Linq.Dynamic;
+using System.Linq.Expressions;
+
 
 namespace LibraryManagement.Controllers {
     public class AuthorsController : Controller {
         private LibraryEntities _db = new LibraryEntities();
         // GET: Authors
-        public ActionResult Index(int? page, string key, int? size) {
+        public ActionResult Index(int? page, int? size, string sortProperty, string sortOrder, string key) {
             ViewBag.title = "Authors";
+            if (page == null) page = 1;
+            //add sortOrder to view bag
+            if (sortOrder == "asc") {
+                ViewBag.sortOrder = "desc";
+            } else if (sortOrder == "desc") {
+                ViewBag.sortOrder = "";
+            } else{
+                ViewBag.sortOrder = "asc";
+            }
+            //default sort is sort id
+            if (sortProperty == null) { 
+                sortProperty = "id";
+                ViewBag.sortOrder = "";
+            }
+            ViewBag.sortProperty = sortProperty;
+            ViewBag.currentSize = size;
+            var properties = typeof(Author).GetProperties();
+            List<Tuple<string, bool, int>> list = new List<Tuple<string, bool, int>>();
+            foreach (var item in properties) {
+                int order = 999;
+                var isVirtual = item.GetAccessors()[0].IsVirtual;
+                if (item.Name == "id") order = 1;
+                if (item.Name == "author_name") order = 2;
+                Tuple<string, bool, int> t = new Tuple<string, bool, int>(item.Name, isVirtual, order);
+                list.Add(t);
+            }
+            //sort by order
+            list = list.OrderBy(x => x.Item3).ToList();
+            //initial sort heading
+            foreach (var item in list) {
+                //create heading table with non virtual part
+                if (!item.Item2) {
+                    if (sortOrder == "desc" && sortProperty == item.Item1) {
+                        ViewBag.Headings += "<th><a href='/authors/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
+                       ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort-desc'></i></th></a></th>";
+                    } else if (sortOrder == "asc" && sortProperty == item.Item1) {
+                        ViewBag.Headings += "<th><a href='/authors/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
+                            ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort-asc'></a></th>";
+                    } else {
+                        ViewBag.Headings += "<th><a href='/authors/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
+                           ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort'></a></th>";
+                    }
+
+                } else {
+                    ViewBag.Headings += "<th>Action</th>";
+                }
+            }
+            //initial dropdown list size
             List<SelectListItem> items = new List<SelectListItem>();
             items.Add(new SelectListItem { Text = "5", Value = "5" });
             items.Add(new SelectListItem { Text = "10", Value = "10" });
@@ -27,21 +78,34 @@ namespace LibraryManagement.Controllers {
             foreach (var item in items) {
                 if (item.Value == size.ToString()) item.Selected = true;
             }
-            ViewBag.currentSize = size;
             ViewBag.size = items;
-            if (page == null) page = 1;
             int pageNumber = (page ?? 1);
             int pageSize = (size ?? 5);
-            var authors = (from a in _db.Authors
-                           select a).OrderBy(a => a.id);
+            //get all authors 
+            var authors = from a in _db.Authors
+                          select a;
+            //check authors list is empty
+            if (authors.Count() == 0) {
+                TempData["message"] = $"Not found anything in system!";
+                TempData["error"] = true;
+                return View(authors.ToPagedList(pageNumber, pageSize));
+            }
+
+            //filter author with key search
             if (!String.IsNullOrEmpty(key)) {
                 authors = authors.Where(a => (a.id + " " + a.author_name).Contains(key)).OrderBy(a => a.id);
                 ViewBag.searchValue = key;
             }
-            if (authors.Count() == 0) {
-                TempData["message"] = $"Not found anything in system!";
-                TempData["error"] = true;
-            }             
+
+            //sort using dynamic linq
+            if (sortOrder == "desc") {
+                authors = authors.OrderBy(sortProperty + " desc");
+            } else if (sortOrder == "asc") {
+                authors = authors.OrderBy(sortProperty);
+            } else {
+                //default is sort by id
+                authors = authors.OrderBy("id");
+            }
             return View(authors.ToPagedList(pageNumber, pageSize));
         }
 
@@ -80,7 +144,7 @@ namespace LibraryManagement.Controllers {
                 TempData["message"] = $"Update author successfully!";
                 return RedirectToAction("Index", new { key = author.id + " " + author.author_name });
             }
-               return View(author);
+            return View(author);
         }
 
         public ActionResult Delete(int? id) {
@@ -101,7 +165,7 @@ namespace LibraryManagement.Controllers {
             dt.Columns.AddRange(new DataColumn[2] { new DataColumn("ID"),
                                             new DataColumn("Name") });
             var authors = from a in _db.Authors
-                            select a;
+                          select a;
             foreach (var author in authors) {
                 dt.Rows.Add(author.id, author.author_name);
             }
