@@ -51,7 +51,7 @@
                                     <td>@category.description</td>
                                     <td>
                                         <a href="@Url.Action("Edit", "Category", new {category.id})" class="btn btn-primary"><i class="fa fa-pencil-square-o"></i> </a>
-                                        <btn onclick="deleteFunction(event,@category.id)" class="btn btn-danger"><i class="fa fa-trash"></i></btn>
+                                        <btn onclick="deleteFunction(@category.id)" class="btn btn-danger"><i class="fa fa-trash"></i></btn>
                                     </td>
                                 </tr>
                             }
@@ -95,9 +95,8 @@
 
 
 <script>
-    function deleteFunction(event, id) {
+    function deleteFunction(id) {
         var { origin } = window.location;
-        event.preventDefault();
         swal({
             title: "Do you want to delete Category " + id + "?",
             text: "",

@@ -89,9 +89,8 @@
 </div>
 
 <script>
-    function deleteFunction(event, id) {
+    function deleteFunction(id) {
         var { origin } = window.location;
-        event.preventDefault();
         swal({
             title: "Do you want to delete Author " + id + "?",
             text: "",

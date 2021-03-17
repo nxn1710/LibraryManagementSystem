@@ -25,45 +25,47 @@ namespace LibraryManagement.Controllers {
                 ViewBag.sortOrder = "desc";
             } else if (sortOrder == "desc") {
                 ViewBag.sortOrder = "";
-            } else{
+            } else {
                 ViewBag.sortOrder = "asc";
             }
             //default sort is sort id
-            if (sortProperty == null) { 
+            if (sortProperty == null) {
                 sortProperty = "id";
                 ViewBag.sortOrder = "";
             }
             ViewBag.sortProperty = sortProperty;
             ViewBag.currentSize = size;
             var properties = typeof(Author).GetProperties();
-            List<Tuple<string, bool, int>> list = new List<Tuple<string, bool, int>>();
+            List<Tuple<string, bool, string>> list = new List<Tuple<string, bool, string>>();
             foreach (var item in properties) {
-                int order = 999;
                 var isVirtual = item.GetAccessors()[0].IsVirtual;
-                if (item.Name == "id") order = 1;
-                if (item.Name == "author_name") order = 2;
-                Tuple<string, bool, int> t = new Tuple<string, bool, int>(item.Name, isVirtual, order);
+                string nameHeading = "";
+                if (item.Name == "id") {
+                    nameHeading = "AuthorID";
+                }
+                if (item.Name == "author_name") {
+                    nameHeading = "AuthorName";
+                }
+                Tuple<string, bool, string> t = new Tuple<string, bool, string>(item.Name, isVirtual, nameHeading);
                 list.Add(t);
             }
-            //sort by order
-            list = list.OrderBy(x => x.Item3).ToList();
             //initial sort heading
             foreach (var item in list) {
                 //create heading table with non virtual part
                 if (!item.Item2) {
                     if (sortOrder == "desc" && sortProperty == item.Item1) {
                         ViewBag.Headings += "<th><a href='/authors/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
-                       ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort-desc'></i></th></a></th>";
+                       ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort-desc'></i></th></a></th>";
                     } else if (sortOrder == "asc" && sortProperty == item.Item1) {
                         ViewBag.Headings += "<th><a href='/authors/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
-                            ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort-asc'></a></th>";
+                            ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort-asc'></a></th>";
                     } else {
                         ViewBag.Headings += "<th><a href='/authors/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
-                           ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort'></a></th>";
+                           ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort'></a></th>";
                     }
 
                 } else {
-                    ViewBag.Headings += "<th>Action</th>";
+                    ViewBag.Headings += "<th>" + item.Item3 +"</th>";
                 }
             }
             //initial dropdown list size

@@ -25,7 +25,6 @@
                             <div class="form-group">
                                 @Html.LabelFor(a => a.description, "Description")
                                 @Html.TextAreaFor(a => a.description, new { @class = "form-control"})
-                                @Html.ValidationMessageFor(m => m.description, null, new { @class = "text-danger" })
                             </div>
                             <button type="submit" class="btn btn-primary">Add Category</button>
                         }
