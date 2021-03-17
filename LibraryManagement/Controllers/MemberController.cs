@@ -10,23 +10,82 @@ using System.Web.Mvc;
 using ClosedXML.Excel;
 using LibraryManagement.Models;
 using PagedList;
-
+using System.Linq.Dynamic;
 namespace LibraryManagement.Controllers {
     public class MemberController : Controller {
         private LibraryEntities _db = new LibraryEntities();
         // GET: Member
         [HttpGet]
 
-        public ActionResult Index(int? page, string keySearch, string sortOrder, string currentFilter, string searchString, int? size) {
-            ViewBag.title = "Members";
-            ViewBag.FullNameSortParm = String.IsNullOrEmpty(sortOrder) ? "fullname_desc" : "";
-            ViewBag.MemberID = String.IsNullOrEmpty(sortOrder) ? "id_desc" : "id_asc";
-            if (searchString != null) {
-                page = 1;
-            } else {
-                searchString = currentFilter;
+        public ActionResult Index(int? page, int? size, string sortProperty, string sortOrder, string key)
+        {
+            ViewBag.title = "Member";
+            if (page == null) page = 1;
+            //add sortOrder to view bag
+            if (sortOrder == "asc")
+            {
+                ViewBag.sortOrder = "desc";
             }
-            ViewBag.CurrentFilter = searchString;
+            else if (sortOrder == "desc")
+            {
+                ViewBag.sortOrder = "";
+            }
+            else
+            {
+                ViewBag.sortOrder = "asc";
+            }
+            //default sort is sort id
+            if (sortProperty == null)
+            {
+                sortProperty = "id";
+                ViewBag.sortOrder = "";
+            }
+            ViewBag.sortProperty = sortProperty;
+            ViewBag.currentSize = size;
+            var properties = typeof(Member).GetProperties();
+            List<Tuple<string, bool, int>> list = new List<Tuple<string, bool, int>>();
+            foreach (var item in properties)
+            {
+                int order = 999;
+                var isVirtual = item.GetAccessors()[0].IsVirtual;
+                if (item.Name == "fullname") order = 2;
+                if (item.Name == "id") order = 1;
+                if (item.Name == "phonenumber") order = 3;
+                if (item.Name == "address") order = 4;
+                Tuple<string, bool, int> t = new Tuple<string, bool, int>(item.Name, isVirtual, order);
+                list.Add(t);
+            }
+            //sort by order
+            list = list.OrderBy(x => x.Item3).ToList();
+            //initial sort heading
+            foreach (var item in list)
+            {
+                //create heading table with non virtual part
+                if (!item.Item2)
+                {
+                    if (sortOrder == "desc" && sortProperty == item.Item1)
+                    {
+                        ViewBag.Headings += "<th><a href='/member/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
+                       ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort-desc'></i></th></a></th>";
+                    }
+                    else if (sortOrder == "asc" && sortProperty == item.Item1)
+                    {
+                        ViewBag.Headings += "<th><a href='/member/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
+                            ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort-asc'></a></th>";
+                    }
+                    else
+                    {
+                        ViewBag.Headings += "<th><a href='/member/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
+                           ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort'></a></th>";
+                    }
+
+                }
+                else
+                {
+                    ViewBag.Headings += "<th>Action</th>";
+                }
+            }
+            //initial dropdown list size
             List<SelectListItem> items = new List<SelectListItem>();
             items.Add(new SelectListItem { Text = "5", Value = "5" });
             items.Add(new SelectListItem { Text = "10", Value = "10" });
@@ -35,38 +94,45 @@ namespace LibraryManagement.Controllers {
             items.Add(new SelectListItem { Text = "50", Value = "50" });
             items.Add(new SelectListItem { Text = "100", Value = "100" });
             items.Add(new SelectListItem { Text = "200", Value = "200" });
-            foreach (var item in items) {
+            foreach (var item in items)
+            {
                 if (item.Value == size.ToString()) item.Selected = true;
             }
-            ViewBag.currentSize = size;
             ViewBag.size = items;
-            if (page == null) page = 1;
             int pageNumber = (page ?? 1);
             int pageSize = (size ?? 5);
+            //get all members 
             var members = from m in _db.Members
                           select m;
-            if (!String.IsNullOrEmpty(keySearch)) {
-                members = members.Where(a => (a.id + " " + a.fullname).Contains(keySearch)).OrderBy(a => a.id);
-                ViewBag.searchValue = keySearch;
-            }
-            if (!String.IsNullOrEmpty(searchString)) {
-                members = members.Where(m => m.fullname.Contains(searchString) || SqlFunctions.StringConvert((double)m.id).Contains(searchString));
-            }
-            if ( members.Count() == 0) {
+            //check authors list is empty
+            if (members.Count() == 0)
+            {
                 TempData["message"] = $"Not found anything in system!";
                 TempData["error"] = true;
+                return View(members.ToPagedList(pageNumber, pageSize));
             }
 
-            switch (sortOrder) {
-                case "fullname_desc":
-                    members = members.OrderByDescending(m => m.fullname);
-                    break;
-                default:
-                    members = members.OrderBy(m => m.fullname);
-                    break;
+            //filter author with key search
+            if (!String.IsNullOrEmpty(key))
+            {
+                members = members.Where(a => (a.id + " " + a.fullname).Contains(key)).OrderBy(a => a.id);
+                ViewBag.searchValue = key;
             }
 
-
+            //sort using dynamic linq
+            if (sortOrder == "desc")
+            {
+                members = members.OrderBy(sortProperty + " desc");
+            }
+            else if (sortOrder == "asc")
+            {
+                members = members.OrderBy(sortProperty);
+            }
+            else
+            {
+                //default is sort by id
+                members = members.OrderBy("id");
+            }
             return View(members.ToPagedList(pageNumber, pageSize));
         }
         public ActionResult Add() {
