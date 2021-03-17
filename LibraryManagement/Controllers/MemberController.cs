@@ -23,7 +23,7 @@ namespace LibraryManagement.Controllers
         {
             ViewBag.title = "Members";
             ViewBag.FullNameSortParm = String.IsNullOrEmpty(sortOrder) ? "fullname_desc" : "";
-            ViewBag.MemberID = String.IsNullOrEmpty(sortOrder) ? "id_desc" : "id_asc";
+            ViewBag.MemberID = sortOrder == "id" ? "id_desc" : "id_asc";
             if (searchString != null)
             {
                 page = 1;
