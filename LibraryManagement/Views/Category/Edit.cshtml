@@ -21,8 +21,7 @@
                             <div class="form-group">
                                 @Html.HiddenFor(a => a.id)
                                 @Html.LabelFor(a => a.description, "Description")
-                                @Html.TextBoxFor(a => a.description, null, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(m => m.description, null, new { @class = "text-danger" })
+                                @Html.TextAreaFor(a => a.description, new { @class = "form-control" })
                             </div>
                             <button type="submit" class="btn btn-info">Update</button>
                         }

@@ -43,20 +43,18 @@ namespace LibraryManagement.Controllers {
             ViewBag.sortProperty = sortProperty;
             ViewBag.currentSize = size;
             var properties = typeof(Member).GetProperties();
-            List<Tuple<string, bool, int>> list = new List<Tuple<string, bool, int>>();
+            List<Tuple<string, bool, string>> list = new List<Tuple<string, bool, string>>();
             foreach (var item in properties)
             {
-                int order = 999;
+                string nameHeading = "";
                 var isVirtual = item.GetAccessors()[0].IsVirtual;
-                if (item.Name == "fullname") order = 2;
-                if (item.Name == "id") order = 1;
-                if (item.Name == "phonenumber") order = 3;
-                if (item.Name == "address") order = 4;
-                Tuple<string, bool, int> t = new Tuple<string, bool, int>(item.Name, isVirtual, order);
+                if (item.Name == "id") nameHeading = "MemberID";
+                if (item.Name == "fullname") nameHeading = "MemberName";
+                if (item.Name == "phonenumber") nameHeading = "Phone Number";
+                if (item.Name == "address") nameHeading = "Address";
+                Tuple<string, bool, string> t = new Tuple<string, bool, string>(item.Name, isVirtual, nameHeading);
                 list.Add(t);
             }
-            //sort by order
-            list = list.OrderBy(x => x.Item3).ToList();
             //initial sort heading
             foreach (var item in list)
             {
@@ -66,23 +64,23 @@ namespace LibraryManagement.Controllers {
                     if (sortOrder == "desc" && sortProperty == item.Item1)
                     {
                         ViewBag.Headings += "<th><a href='/member/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
-                       ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort-desc'></i></th></a></th>";
+                       ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort-desc'></i></th></a></th>";
                     }
                     else if (sortOrder == "asc" && sortProperty == item.Item1)
                     {
                         ViewBag.Headings += "<th><a href='/member/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
-                            ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort-asc'></a></th>";
+                            ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort-asc'></a></th>";
                     }
                     else
                     {
                         ViewBag.Headings += "<th><a href='/member/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
-                           ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort'></a></th>";
+                           ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort'></a></th>";
                     }
 
                 }
                 else
                 {
-                    ViewBag.Headings += "<th>Action</th>";
+                    ViewBag.Headings += "<th>"+item.Item3+"</th>";
                 }
             }
             //initial dropdown list size
@@ -104,7 +102,7 @@ namespace LibraryManagement.Controllers {
             //get all members 
             var members = from m in _db.Members
                           select m;
-            //check authors list is empty
+            //check members list is empty
             if (members.Count() == 0)
             {
                 TempData["message"] = $"Not found anything in system!";
@@ -112,7 +110,7 @@ namespace LibraryManagement.Controllers {
                 return View(members.ToPagedList(pageNumber, pageSize));
             }
 
-            //filter author with key search
+            //filter member with key search
             if (!String.IsNullOrEmpty(key))
             {
                 members = members.Where(a => (a.id + " " + a.fullname).Contains(key)).OrderBy(a => a.id);
