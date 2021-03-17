@@ -1,0 +1,114 @@
+﻿@model PagedList.IPagedList<LibraryManagement.Models.BookCategory>
+@using PagedList.Mvc;
+
+<div class="row">
+    @if (TempData["message"] != null)
+    {
+        var className = "alert text-center " + (@TempData["error"] != null ? "alert-danger" : "alert-success");
+        <p class="@className">
+            @TempData["message"]
+        </p>
+    }
+    <div class="col-sm-9 mb-1">
+        <form action="/Category/Index" method="GET">
+            <div class="col-sm-5 pl-0">
+                @Html.TextBox("key", null, new { @class = "form-control input-sm" })
+                @Html.Hidden("sortProperty", (object)ViewBag.sortProperty)
+                @Html.Hidden("sortOrder", (object)ViewBag.sortOrder)
+            </div>
+            <div class="col-sm-7">
+                <input class="btn btn-primary" type="submit" value="Search" />
+                @Html.ActionLink("Clear", "Index", "Category", null, new { @class = "btn btn-default" })
+                <a href="@Url.Action("Add", "Category")" class="btn btn-success">
+                    <i class="fa fa-plus"></i>
+                    Add New
+                </a>
+                <a href="@Url.Action("Export", "Category")" class="btn btn-info"><i class="fa fa-download" aria-hidden="true"></i> Export to excel</a>
+            </div>
+        </form>
+    </div>
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                All Categories in library
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover"
+                           id="dataTables-example">
+                        <thead>
+                            <tr>
+                                @Html.Raw(ViewBag.Headings)
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var category in Model)
+                            {
+                                <tr>
+
+                                    <td>@category.id</td>
+                                    <td>@category.category_name</td>
+                                    <td>@category.description</td>
+                                    <td>
+                                        <a href="@Url.Action("Edit", "Category", new {category.id})" class="btn btn-primary"><i class="fa fa-pencil-square-o"></i> </a>
+                                        <btn onclick="deleteFunction(event,@category.id)" class="btn btn-danger"><i class="fa fa-trash"></i></btn>
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-6">
+        @*@using (Html.BeginForm("Index", "Authors", FormMethod.Get)) {
+                <p class="m-20" style="width: 75px">
+                    @Html.DropDownList("size", (List<SelectListItem>)ViewBag.size, new { @class = "form-control", @onchange = "this.form.submit();" })
+                </p>
+            }*@
+        <form action="/Category/Index" method="GET">
+            <p class="m-20" style="width: 75px">
+                @Html.DropDownList("size", (List<SelectListItem>)ViewBag.size, new { @class = "form-control", @onchange = "this.form.submit();" })
+                @Html.Hidden("sortProperty", (object)ViewBag.sortProperty)
+                @Html.Hidden("sortOrder", (object)ViewBag.sortOrder)
+                @Html.Hidden("key", (object)ViewBag.searchValue)
+            </p>
+        </form>
+    </div>
+    <div class="col-lg-6">
+        @Html.PagedListPager(Model, page => Url.Action("Index",
+         new
+              {
+             page,
+             size = ViewBag.currentSize,
+             sortProperty = ViewBag.sortProperty,
+             sortOrder = ViewBag.sortProperty,
+             key = ViewBag.searchValue
+         }))
+    </div>
+
+</div>
+
+
+<script>
+    function deleteFunction(event, id) {
+        var { origin } = window.location;
+        event.preventDefault();
+        swal({
+            title: "Do you want to delete Category " + id + "?",
+            text: "",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    window.location = `${origin}/Category/Delete/${id}`;
+                }
+            });
+    }
+</script>

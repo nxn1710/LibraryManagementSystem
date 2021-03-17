@@ -1,0 +1,39 @@
+﻿
+
+@{
+    ViewBag.Title = "Category-Add";
+}
+@model LibraryManagement.Models.BookCategory
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                Add category form
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        @using (Html.BeginForm("Add", "Category", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="form-group">
+                                @Html.LabelFor(a => a.category_name, "Category Name")
+                                @Html.TextBoxFor(a => a.category_name, null, new { @class = "form-control", @placeholder = "Category name" })
+                                @Html.ValidationMessageFor(m => m.category_name, null, new { @class = "text-danger" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(a => a.description, "Description")
+                                @Html.TextAreaFor(a => a.description, new { @class = "form-control"})
+                                @Html.ValidationMessageFor(m => m.description, null, new { @class = "text-danger" })
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Category</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
