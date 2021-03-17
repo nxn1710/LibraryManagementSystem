@@ -11,25 +11,19 @@ using ClosedXML.Excel;
 using LibraryManagement.Models;
 using PagedList;
 
-namespace LibraryManagement.Controllers
-{
-    public class MemberController : Controller
-    {
+namespace LibraryManagement.Controllers {
+    public class MemberController : Controller {
         private LibraryEntities _db = new LibraryEntities();
         // GET: Member
         [HttpGet]
 
-        public ActionResult Index(int? page, string keySearch, string sortOrder, string currentFilter, string searchString, int? size)
-        {
+        public ActionResult Index(int? page, string keySearch, string sortOrder, string currentFilter, string searchString, int? size) {
             ViewBag.title = "Members";
             ViewBag.FullNameSortParm = String.IsNullOrEmpty(sortOrder) ? "fullname_desc" : "";
             ViewBag.MemberID = String.IsNullOrEmpty(sortOrder) ? "id_desc" : "id_asc";
-            if (searchString != null)
-            {
+            if (searchString != null) {
                 page = 1;
-            }
-            else
-            {
+            } else {
                 searchString = currentFilter;
             }
             ViewBag.CurrentFilter = searchString;
@@ -41,8 +35,7 @@ namespace LibraryManagement.Controllers
             items.Add(new SelectListItem { Text = "50", Value = "50" });
             items.Add(new SelectListItem { Text = "100", Value = "100" });
             items.Add(new SelectListItem { Text = "200", Value = "200" });
-            foreach (var item in items)
-            {
+            foreach (var item in items) {
                 if (item.Value == size.ToString()) item.Selected = true;
             }
             ViewBag.currentSize = size;
@@ -51,24 +44,20 @@ namespace LibraryManagement.Controllers
             int pageNumber = (page ?? 1);
             int pageSize = (size ?? 5);
             var members = from m in _db.Members
-                           select m;
-            if (!String.IsNullOrEmpty(keySearch))
-            {
+                          select m;
+            if (!String.IsNullOrEmpty(keySearch)) {
                 members = members.Where(a => (a.id + " " + a.fullname).Contains(keySearch)).OrderBy(a => a.id);
                 ViewBag.searchValue = keySearch;
             }
-            if (!String.IsNullOrEmpty(searchString))
-            {
+            if (!String.IsNullOrEmpty(searchString)) {
                 members = members.Where(m => m.fullname.Contains(searchString) || SqlFunctions.StringConvert((double)m.id).Contains(searchString));
             }
-            if (members.Count() == 0)
-            {
+            if ( members.Count() == 0) {
                 TempData["message"] = $"Not found anything in system!";
                 TempData["error"] = true;
             }
-            
-            switch (sortOrder)
-            {
+
+            switch (sortOrder) {
                 case "fullname_desc":
                     members = members.OrderByDescending(m => m.fullname);
                     break;
@@ -80,18 +69,15 @@ namespace LibraryManagement.Controllers
 
             return View(members.ToPagedList(pageNumber, pageSize));
         }
-        public ActionResult Add()
-        {
+        public ActionResult Add() {
             ViewBag.title = "Members - Add";
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Add(Member member)
-        {
-            if (ModelState.IsValid)
-            {
+        public ActionResult Add(Member member) {
+            if (ModelState.IsValid) {
                 _db.Members.Add(member);
                 _db.SaveChanges();
                 TempData["message"] = $"Add member successfully!";
@@ -101,11 +87,9 @@ namespace LibraryManagement.Controllers
         }
 
 
-        public ActionResult Edit(int? id)
-        {
+        public ActionResult Edit(int? id) {
             var member = (from a in _db.Members where a.id == id select a).SingleOrDefault();
-            if (id == null || member == null)
-            {
+            if (id == null || member == null) {
                 TempData["message"] = $"Update fail, Cannot found that Members in system!";
                 TempData["error"] = true;
                 return RedirectToAction("Index");
@@ -114,10 +98,8 @@ namespace LibraryManagement.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Member member)
-        {
-            if (ModelState.IsValid)
-            {
+        public ActionResult Edit(Member member) {
+            if (ModelState.IsValid) {
                 _db.Entry(member).State = EntityState.Modified;
                 _db.SaveChanges();
                 TempData["message"] = $"Update members successfully!";
@@ -126,11 +108,9 @@ namespace LibraryManagement.Controllers
             return View(member);
         }
 
-        public ActionResult Delete(int? id)
-        {
+        public ActionResult Delete(int? id) {
             var member = (from a in _db.Members where a.id == id select a).SingleOrDefault();
-            if (id == null || member == null)
-            {
+            if (id == null || member == null) {
                 TempData["message"] = $"Delete fail, Cannot found that Member in system!";
                 TempData["error"] = true;
                 return RedirectToAction("Index");
@@ -141,8 +121,7 @@ namespace LibraryManagement.Controllers
             return RedirectToAction("Index");
         }
 
-        public FileResult Export()
-        {
+        public FileResult Export() {
             DataTable dt = new DataTable("Grid");
             dt.Columns.AddRange(new DataColumn[4] { new DataColumn("ID"),
                                                      new DataColumn("Full Name"),
@@ -151,16 +130,13 @@ namespace LibraryManagement.Controllers
             });
             var members = from m in _db.Members
                           select m;
-            foreach (var member in members)
-            {
+            foreach (var member in members) {
                 dt.Rows.Add(member.id, member.fullname, member.phonenumber, member.address);
             }
-            using (XLWorkbook wb = new XLWorkbook())
-            {
+            using (XLWorkbook wb = new XLWorkbook()) {
                 wb.Worksheets.Add(dt);
                 DateTime today = DateTime.Today;
-                using (MemoryStream stream = new MemoryStream())
-                {
+                using (MemoryStream stream = new MemoryStream()) {
                     wb.SaveAs(stream);
                     return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Member {today.ToString("dd/MM/yyyy")}.xlsx");
                 }
