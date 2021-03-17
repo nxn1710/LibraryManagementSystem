@@ -11,7 +11,8 @@ namespace LibraryManagement.Models
 {
     using System;
     using System.Collections.Generic;
-    
+    using System.ComponentModel.DataAnnotations;
+
     public partial class BookCategory
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
@@ -21,7 +22,11 @@ namespace LibraryManagement.Models
         }
     
         public int id { get; set; }
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a Category Name")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Please length of name must be from 3 to 50 characters")]
         public string category_name { get; set; }
+
+      
         public string description { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
