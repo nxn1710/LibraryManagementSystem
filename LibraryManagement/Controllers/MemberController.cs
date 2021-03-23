@@ -16,71 +16,51 @@ namespace LibraryManagement.Controllers {
         private LibraryEntities _db = new LibraryEntities();
         // GET: Member
         [HttpGet]
-
-        public ActionResult Index(int? page, int? size, string sortProperty, string sortOrder, string key)
-        {
+        public ActionResult Index(int? page, int? size, string sortProperty, string sortOrder, string key) {
             ViewBag.title = "Member";
             if (page == null) page = 1;
             //add sortOrder to view bag
-            if (sortOrder == "asc")
-            {
+            if (sortOrder == "asc") {
                 ViewBag.sortOrder = "desc";
-            }
-            else if (sortOrder == "desc")
-            {
+            } else if (sortOrder == "desc") {
                 ViewBag.sortOrder = "";
-            }
-            else
-            {
+            } else {
                 ViewBag.sortOrder = "asc";
             }
             //default sort is sort id
-            if (sortProperty == null)
-            {
+            if (sortProperty == null) {
                 sortProperty = "id";
                 ViewBag.sortOrder = "";
             }
             ViewBag.sortProperty = sortProperty;
             ViewBag.currentSize = size;
             var properties = typeof(Member).GetProperties();
-            List<Tuple<string, bool, string>> list = new List<Tuple<string, bool, string>>();
-            foreach (var item in properties)
-            {
-                string nameHeading = "";
+            List<Tuple<string, bool>> list = new List<Tuple<string, bool>>();
+            foreach (var item in properties) {
                 var isVirtual = item.GetAccessors()[0].IsVirtual;
-                if (item.Name == "id") nameHeading = "MemberID";
-                if (item.Name == "fullname") nameHeading = "MemberName";
-                if (item.Name == "phonenumber") nameHeading = "Phone Number";
-                if (item.Name == "address") nameHeading = "Address";
-                Tuple<string, bool, string> t = new Tuple<string, bool, string>(item.Name, isVirtual, nameHeading);
+                Tuple<string, bool> t = new Tuple<string, bool>(item.Name, isVirtual);
+                if (isVirtual) {
+                    continue;
+                }
                 list.Add(t);
             }
             //initial sort heading
-            foreach (var item in list)
-            {
+            foreach (var item in list) {
                 //create heading table with non virtual part
-                if (!item.Item2)
-                {
-                    if (sortOrder == "desc" && sortProperty == item.Item1)
-                    {
+                if (!item.Item2) {
+                    if (sortOrder == "desc" && sortProperty == item.Item1) {
                         ViewBag.Headings += "<th><a href='/member/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
-                       ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort-desc'></i></th></a></th>";
-                    }
-                    else if (sortOrder == "asc" && sortProperty == item.Item1)
-                    {
+                       ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort-desc'></i></th></a></th>";
+                    } else if (sortOrder == "asc" && sortProperty == item.Item1) {
                         ViewBag.Headings += "<th><a href='/member/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
-                            ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort-asc'></a></th>";
-                    }
-                    else
-                    {
+                            ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort-asc'></a></th>";
+                    } else {
                         ViewBag.Headings += "<th><a href='/member/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
-                           ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort'></a></th>";
+                           ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort'></a></th>";
                     }
 
-                }
-                else
-                {
-                    ViewBag.Headings += "<th>"+item.Item3+"</th>";
+                } else {
+                    ViewBag.Headings += "<th>" + item.Item1 + "</th>";
                 }
             }
             //initial dropdown list size
@@ -92,8 +72,7 @@ namespace LibraryManagement.Controllers {
             items.Add(new SelectListItem { Text = "50", Value = "50" });
             items.Add(new SelectListItem { Text = "100", Value = "100" });
             items.Add(new SelectListItem { Text = "200", Value = "200" });
-            foreach (var item in items)
-            {
+            foreach (var item in items) {
                 if (item.Value == size.ToString()) item.Selected = true;
             }
             ViewBag.size = items;
@@ -103,31 +82,24 @@ namespace LibraryManagement.Controllers {
             var members = from m in _db.Members
                           select m;
             //check members list is empty
-            if (members.Count() == 0)
-            {
+            if (members.Count() == 0) {
                 TempData["message"] = $"Not found anything in system!";
                 TempData["error"] = true;
                 return View(members.ToPagedList(pageNumber, pageSize));
             }
 
             //filter member with key search
-            if (!String.IsNullOrEmpty(key))
-            {
-                members = members.Where(a => (a.id + " " + a.fullname).Contains(key)).OrderBy(a => a.id);
+            if (!String.IsNullOrEmpty(key)) {
+                members = members.Where(a => (a.ID + " " + a.FullName).Contains(key)).OrderBy(a => a.ID);
                 ViewBag.searchValue = key;
             }
 
             //sort using dynamic linq
-            if (sortOrder == "desc")
-            {
+            if (sortOrder == "desc") {
                 members = members.OrderBy(sortProperty + " desc");
-            }
-            else if (sortOrder == "asc")
-            {
+            } else if (sortOrder == "asc") {
                 members = members.OrderBy(sortProperty);
-            }
-            else
-            {
+            } else {
                 //default is sort by id
                 members = members.OrderBy("id");
             }
@@ -145,14 +117,14 @@ namespace LibraryManagement.Controllers {
                 _db.Members.Add(member);
                 _db.SaveChanges();
                 TempData["message"] = $"Add member successfully!";
-                return RedirectToAction("Index", new { key = member.id + " " + member.fullname });
+                return RedirectToAction("Index", new { key = member.ID + " " + member.FullName });
             }
             return View();
         }
 
 
         public ActionResult Edit(int? id) {
-            var member = (from a in _db.Members where a.id == id select a).SingleOrDefault();
+            var member = (from a in _db.Members where a.ID == id select a).SingleOrDefault();
             if (id == null || member == null) {
                 TempData["message"] = $"Update fail, Cannot found that Members in system!";
                 TempData["error"] = true;
@@ -167,13 +139,13 @@ namespace LibraryManagement.Controllers {
                 _db.Entry(member).State = EntityState.Modified;
                 _db.SaveChanges();
                 TempData["message"] = $"Update members successfully!";
-                return RedirectToAction("Index", new { key = member.id + " " + member.fullname });
+                return RedirectToAction("Index", new { key = member.ID + " " + member.FullName });
             }
             return View(member);
         }
 
         public ActionResult Delete(int? id) {
-            var member = (from a in _db.Members where a.id == id select a).SingleOrDefault();
+            var member = (from a in _db.Members where a.ID == id select a).SingleOrDefault();
             if (id == null || member == null) {
                 TempData["message"] = $"Delete fail, Cannot found that Member in system!";
                 TempData["error"] = true;
@@ -181,7 +153,7 @@ namespace LibraryManagement.Controllers {
             }
             _db.Members.Remove(member);
             _db.SaveChanges();
-            TempData["message"] = $"Delete Author {id} - {member.fullname} successfully!";
+            TempData["message"] = $"Delete Author {id} - {member.FullName} successfully!";
             return RedirectToAction("Index");
         }
 
@@ -195,7 +167,7 @@ namespace LibraryManagement.Controllers {
             var members = from m in _db.Members
                           select m;
             foreach (var member in members) {
-                dt.Rows.Add(member.id, member.fullname, member.phonenumber, member.address);
+                dt.Rows.Add(member.ID, member.FullName, member.PhoneNumber, member.Address);
             }
             using (XLWorkbook wb = new XLWorkbook()) {
                 wb.Worksheets.Add(dt);
@@ -206,70 +178,5 @@ namespace LibraryManagement.Controllers {
                 }
             }
         }
-
-
-
-        //public ActionResult ShowAll(string fullname)
-        //{
-        //    var members = _db.Members.Where(m => m.fullname.StartsWith(fullname) || fullname == null).ToList();
-        //    ViewBag.members = members;
-        //    //var members = (from s in _db.Members select s).ToList();
-        //    //ViewBag.members = members;
-
-        //    return View(members);
-        //}
-
-        //[HttpGet]
-        //public ActionResult Store()
-        //{
-        //    return View();
-        //}
-
-        //[HttpPost]
-        //public ActionResult Store(Member mb)
-        //{
-        //    if (ModelState.IsValid) {
-        //        _db.Members.Add(mb);
-        //        _db.SaveChanges();
-        //        return RedirectToAction("ShowAll");
-        //    }
-        //    ViewBag.message = "Insert member failed!!";
-        //    return View();
-        //}
-
-        //[HttpGet]
-        //public ActionResult Edit(int id)
-        //{
-        //    var memberByID = _db.Members.Where(m => m.id == id).FirstOrDefault();
-        //    return View(memberByID);
-        //}
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Edit([Bind(Include = "id,fullname,phonenumber,address,Update_at")] Member mb)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        var memberByID = _db.Members.Find(mb.id);
-        //        memberByID.fullname = mb.fullname;
-        //        memberByID.phonenumber = mb.phonenumber;
-        //        memberByID.address = mb.address;
-        //        _db.Entry(memberByID).State = EntityState.Modified;
-        //        _db.SaveChanges();
-        //        return RedirectToAction("ShowAll");
-        //    }
-        //    var memberEdit = _db.Members.Where(m => m.id == mb.id).FirstOrDefault();
-        //    return View(memberEdit);
-        //}
-
-        //[HttpGet]
-        //public ActionResult Delete(int? id)
-        //{
-        //    var member = _db.Members.Where(m => m.id == id).First();
-        //    _db.Members.Remove(member);
-        //    _db.SaveChanges();
-        //    return RedirectToAction("ShowAll");
-        //}
-
     }
 }

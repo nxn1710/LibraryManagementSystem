@@ -37,17 +37,18 @@
                         <thead>
                             <tr>
                                 @Html.Raw(ViewBag.Headings)
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var author in Model) {
                                 <tr>
 
-                                    <td>@author.id</td>
-                                    <td> @author.author_name</td>
+                                    <td>@author.ID</td>
+                                    <td> @author.AuthorName</td>
                                     <td>
-                                        <a href="@Url.Action("Edit", "Authors", new {@author.id})" class="btn btn-primary"><i class="fa fa-pencil-square-o"></i> </a>
-                                        <btn onclick="deleteFunction(@author.id)" class="btn btn-danger"><i class="fa fa-trash"></i></btn>
+                                        <a href="@Url.Action("Edit", "Authors", new {@author.ID})" class="btn btn-primary"><i class="fa fa-pencil-square-o"></i> </a>
+                                        <btn onclick="deleteFunction(@author.ID)" class="btn btn-danger"><i class="fa fa-trash"></i></btn>
                                     </td>
                                 </tr>
                             }

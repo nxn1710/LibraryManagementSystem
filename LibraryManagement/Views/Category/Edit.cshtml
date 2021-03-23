@@ -4,7 +4,7 @@
     <div class="col-lg-6">
         <div class="panel panel-info">
             <div class="panel-heading">
-                Update Category ID @Model.id
+                Update Category ID @Model.ID
             </div>
             <div class="panel-body">
                 <div class="row">
@@ -13,15 +13,15 @@
                         {
                             @Html.AntiForgeryToken()
                             <div class="form-group">
-                                @Html.HiddenFor(a => a.id)
-                                @Html.LabelFor(a => a.category_name, "Category Name")
-                                @Html.TextBoxFor(a => a.category_name, null, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(m => m.category_name, null, new { @class = "text-danger" })
+                                @Html.HiddenFor(a => a.ID)
+                                @Html.LabelFor(a => a.CategoryName, "Category Name")
+                                @Html.TextBoxFor(a => a.CategoryName, null, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.CategoryName, null, new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
-                                @Html.HiddenFor(a => a.id)
-                                @Html.LabelFor(a => a.description, "Description")
-                                @Html.TextAreaFor(a => a.description, new { @class = "form-control" })
+                                @Html.HiddenFor(a => a.ID)
+                                @Html.LabelFor(a => a.Description, "Description")
+                                @Html.TextAreaFor(a => a.Description, new { @class = "form-control" })
                             </div>
                             <button type="submit" class="btn btn-info">Update</button>
                         }

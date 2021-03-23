@@ -20,14 +20,14 @@ namespace LibraryManagement.Models
             this.BorrowedDetails = new HashSet<BorrowedDetail>();
         }
     
-        public int id { get; set; }
-        public int member_id { get; set; }
-        public int staff_id { get; set; }
-        public System.DateTime borrowed_time { get; set; }
-        public System.DateTime return_deadline { get; set; }
-        public bool @return { get; set; }
-        public System.DateTime return_time { get; set; }
-        public float total_price { get; set; }
+        public int ID { get; set; }
+        public int MemberID { get; set; }
+        public int StaffID { get; set; }
+        public float TotalPrice { get; set; }
+        public System.DateTime BorrowedTime { get; set; }
+        public System.DateTime ReturnDeadline { get; set; }
+        public System.DateTime ReturnTime { get; set; }
+        public bool Return { get; set; }
     
         public virtual Member Member { get; set; }
         public virtual StaffAccount StaffAccount { get; set; }

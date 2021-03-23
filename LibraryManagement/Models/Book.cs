@@ -20,14 +20,14 @@ namespace LibraryManagement.Models
             this.BorrowedDetails = new HashSet<BorrowedDetail>();
         }
     
-        public int id { get; set; }
-        public string title { get; set; }
-        public int author_id { get; set; }
-        public float price { get; set; }
-        public string description { get; set; }
-        public int category_id { get; set; }
-        public string thumbnail { get; set; }
-        public int available_book { get; set; }
+        public int ID { get; set; }
+        public string Title { get; set; }
+        public string Thumbnail { get; set; }
+        public float Price { get; set; }
+        public int AvailableBook { get; set; }
+        public string Description { get; set; }
+        public int AuthorID { get; set; }
+        public int CategoryID { get; set; }
     
         public virtual Author Author { get; set; }
         public virtual BookCategory BookCategory { get; set; }

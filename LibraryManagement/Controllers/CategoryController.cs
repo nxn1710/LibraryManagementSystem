@@ -37,22 +37,13 @@ namespace LibraryManagement.Controllers {
             ViewBag.sortProperty = sortProperty;
             ViewBag.currentSize = size;
             var properties = typeof(BookCategory).GetProperties();
-            List<Tuple<string, bool,string>> list = new List<Tuple<string, bool,string>>();
+            List<Tuple<string, bool>> list = new List<Tuple<string, bool>>();
             foreach (var item in properties) {
                 var isVirtual = item.GetAccessors()[0].IsVirtual;
-                string nameHeading = "";
-                if (item.Name == "id") {
-                    nameHeading = "CategoryID";
+                if (item.Name == "Books") {
+                    continue;
                 }
-                if (item.Name == "category_name") {
-                    nameHeading = "CategoryName";
-                }
-                if (item.Name == "description") {
-                    isVirtual = true;
-                    nameHeading = "Description";
-                }
-
-                Tuple<string, bool, string> t = new Tuple<string, bool, string>(item.Name, isVirtual, nameHeading);
+                Tuple<string, bool> t = new Tuple<string, bool>(item.Name, isVirtual);
                 list.Add(t);
             }
             //initial sort heading
@@ -61,17 +52,17 @@ namespace LibraryManagement.Controllers {
                 if (!item.Item2) {
                     if (sortOrder == "desc" && sortProperty == item.Item1) {
                         ViewBag.Headings += "<th><a href='/category/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
-                       ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort-desc'></i></th></a></th>";
+                       ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort-desc'></i></th></a></th>";
                     } else if (sortOrder == "asc" && sortProperty == item.Item1) {
                         ViewBag.Headings += "<th><a href='/category/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
-                            ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort-asc'></a></th>";
+                            ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort-asc'></a></th>";
                     } else {
                         ViewBag.Headings += "<th><a href='/category/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
-                           ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort'></a></th>";
+                           ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort'></a></th>";
                     }
 
                 } else {
-                    ViewBag.Headings += "<th>" + item.Item3+"</th>";
+                    ViewBag.Headings += "<th>" + item.Item1 + "</th>";
                 }
             }
             //initial dropdown list size
@@ -101,7 +92,7 @@ namespace LibraryManagement.Controllers {
 
             //filter author with key search
             if (!String.IsNullOrEmpty(key)) {
-                categories = categories.Where(c => (c.id + " " + c.category_name).Contains(key)).OrderBy(c => c.id);
+                categories = categories.Where(c => (c.ID + " " + c.CategoryName).Contains(key)).OrderBy(c => c.ID);
                 ViewBag.searchValue = key;
             }
 
@@ -130,14 +121,14 @@ namespace LibraryManagement.Controllers {
                 _db.BookCategories.Add(category);
                 _db.SaveChanges();
                 TempData["message"] = $"Add author successfully!";
-                return RedirectToAction("Index", new { key = category.id + " " + category.category_name });
+                return RedirectToAction("Index", new { key = category.ID + " " + category.CategoryName });
             }
             return View();
         }
 
 
         public ActionResult Edit(int? id) {
-            var category = (from a in _db.BookCategories where a.id == id select a).SingleOrDefault();
+            var category = (from a in _db.BookCategories where a.ID == id select a).SingleOrDefault();
             if (id == null || category == null) {
                 TempData["message"] = $"Update fail, Cannot found that Category in system!";
                 TempData["error"] = true;
@@ -152,13 +143,13 @@ namespace LibraryManagement.Controllers {
                 _db.Entry(category).State = EntityState.Modified;
                 _db.SaveChanges();
                 TempData["message"] = $"Update author successfully!";
-                return RedirectToAction("Index", new { key = category.id + " " + category.category_name });
+                return RedirectToAction("Index", new { key = category.ID + " " + category.CategoryName });
             }
             return View(category);
         }
 
         public ActionResult Delete(int? id) {
-            var category = (from a in _db.BookCategories where a.id == id select a).SingleOrDefault();
+            var category = (from a in _db.BookCategories where a.ID == id select a).SingleOrDefault();
             if (id == null || category == null) {
                 TempData["message"] = $"Delete fail, Cannot found that Author in system!";
                 TempData["error"] = true;
@@ -166,7 +157,7 @@ namespace LibraryManagement.Controllers {
             }
             _db.BookCategories.Remove(category);
             _db.SaveChanges();
-            TempData["message"] = $"Delete Author {id} - {category.category_name} successfully!";
+            TempData["message"] = $"Delete Author {id} - {category.CategoryName} successfully!";
             return RedirectToAction("Index");
         }
 
@@ -177,7 +168,7 @@ namespace LibraryManagement.Controllers {
             var categories = from a in _db.BookCategories
                              select a;
             foreach (var category in categories) {
-                dt.Rows.Add(category.id, category.category_name, category.description);
+                dt.Rows.Add(category.ID, category.CategoryName, category.Description);
             }
             using (XLWorkbook wb = new XLWorkbook()) {
                 wb.Worksheets.Add(dt);

@@ -14,9 +14,9 @@ namespace LibraryManagement.Models
     
     public partial class BorrowedDetail
     {
-        public int id { get; set; }
-        public int book_id { get; set; }
-        public int borrow_id { get; set; }
+        public int ID { get; set; }
+        public int BookID { get; set; }
+        public int BorrowID { get; set; }
     
         public virtual Book Book { get; set; }
         public virtual Borrowed Borrowed { get; set; }

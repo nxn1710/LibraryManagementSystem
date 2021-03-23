@@ -4,7 +4,7 @@
     <div class="col-lg-6">
         <div class="panel panel-info">
             <div class="panel-heading">
-                Update Author ID @Model.id
+                Update Author ID @Model.ID
             </div>
             <div class="panel-body">
                 <div class="row">
@@ -12,10 +12,10 @@
                         @using (Html.BeginForm("Edit", "Authors", FormMethod.Post)) {
                             @Html.AntiForgeryToken()
                         <div class="form-group">
-                            @Html.HiddenFor(a => a.id)
-                            @Html.LabelFor(a => a.author_name, "Author Name")
-                            @Html.TextBoxFor(a => a.author_name, null, new { @class = "form-control" })
-                            @Html.ValidationMessageFor(m => m.author_name, null, new { @class = "text-danger" })
+                            @Html.HiddenFor(a => a.ID)
+                            @Html.LabelFor(a => a.AuthorName, "Author Name")
+                            @Html.TextBoxFor(a => a.AuthorName, null, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.AuthorName, null, new { @class = "text-danger" })
                         </div>
                             <button type="submit" class="btn btn-info">Update</button>
                         }

@@ -1,0 +1,37 @@
+﻿@model LibraryManagement.Models.StaffAccount
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                Update Staff ID @Model.ID
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        @using (Html.BeginForm("Edit", "Staff", FormMethod.Post)) {
+                            @Html.AntiForgeryToken()
+                            <div class="form-group">
+                                @Html.LabelFor(s => s.Username, "Username")
+                                @Html.TextBoxFor(s => s.Username, null, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(s => s.Username, null, new { @class = "text-danger" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(s => s.Password, "Password")
+                                @Html.TextBoxFor(s => s.Password, null, new { @class = "form-control", @type = "password", @placeholder = "Leave blank if you dont want to edit password" })
+                                @Html.ValidationMessageFor(s => s.Password, null, new { @class = "text-danger"})
+                            </div>
+                            <div class="form-group">
+
+                                @Html.LabelFor(s => s.FullName, "Staff fullname")
+                                @Html.TextBoxFor(s => s.FullName, null, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(s => s.FullName, null, new { @class = "text-danger" })
+                            </div>
+                            <button type="submit" class="btn btn-info">Edit</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -18,13 +18,13 @@
                         {
                             @Html.AntiForgeryToken()
                             <div class="form-group">
-                                @Html.LabelFor(a => a.category_name, "Category Name")
-                                @Html.TextBoxFor(a => a.category_name, null, new { @class = "form-control", @placeholder = "Category name" })
-                                @Html.ValidationMessageFor(m => m.category_name, null, new { @class = "text-danger" })
+                                @Html.LabelFor(a => a.CategoryName, "Category Name")
+                                @Html.TextBoxFor(a => a.CategoryName, null, new { @class = "form-control", @placeholder = "Category name" })
+                                @Html.ValidationMessageFor(m => m.CategoryName, null, new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
-                                @Html.LabelFor(a => a.description, "Description")
-                                @Html.TextAreaFor(a => a.description, new { @class = "form-control"})
+                                @Html.LabelFor(a => a.Description, "Description")
+                                @Html.TextAreaFor(a => a.Description, new { @class = "form-control"})
                             </div>
                             <button type="submit" class="btn btn-primary">Add Category</button>
                         }

@@ -11,7 +11,8 @@ namespace LibraryManagement.Models
 {
     using System;
     using System.Collections.Generic;
-    
+    using System.ComponentModel.DataAnnotations;
+
     public partial class StaffAccount
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
@@ -20,10 +21,18 @@ namespace LibraryManagement.Models
             this.Borroweds = new HashSet<Borrowed>();
         }
     
-        public int id { get; set; }
-        public string username { get; set; }
-        public string password { get; set; }
-        public string fullname { get; set; }
+        public int ID { get; set; }
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid username")]
+        [StringLength(20, MinimumLength = 6, ErrorMessage = "Length must be between 6 to 20 characters")]
+        public string Username { get; set; }
+
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid password")]
+        [StringLength(64, MinimumLength = 6, ErrorMessage = "Length must be between 6 to 20 characters")]
+        public string Password { get; set; }
+
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid password")]
+        [StringLength(64, MinimumLength = 6, ErrorMessage = "Length must be between 6 to 64 characters")]
+        public string FullName { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Borrowed> Borroweds { get; set; }

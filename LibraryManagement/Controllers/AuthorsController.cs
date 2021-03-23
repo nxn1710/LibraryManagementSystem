@@ -36,17 +36,13 @@ namespace LibraryManagement.Controllers {
             ViewBag.sortProperty = sortProperty;
             ViewBag.currentSize = size;
             var properties = typeof(Author).GetProperties();
-            List<Tuple<string, bool, string>> list = new List<Tuple<string, bool, string>>();
+            List<Tuple<string, bool>> list = new List<Tuple<string, bool>>();
             foreach (var item in properties) {
                 var isVirtual = item.GetAccessors()[0].IsVirtual;
-                string nameHeading = "";
-                if (item.Name == "id") {
-                    nameHeading = "AuthorID";
+                if (isVirtual) {
+                    continue;
                 }
-                if (item.Name == "author_name") {
-                    nameHeading = "AuthorName";
-                }
-                Tuple<string, bool, string> t = new Tuple<string, bool, string>(item.Name, isVirtual, nameHeading);
+                Tuple<string, bool> t = new Tuple<string, bool>(item.Name, isVirtual);
                 list.Add(t);
             }
             //initial sort heading
@@ -55,17 +51,17 @@ namespace LibraryManagement.Controllers {
                 if (!item.Item2) {
                     if (sortOrder == "desc" && sortProperty == item.Item1) {
                         ViewBag.Headings += "<th><a href='/authors/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
-                       ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort-desc'></i></th></a></th>";
+                       ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort-desc'></i></th></a></th>";
                     } else if (sortOrder == "asc" && sortProperty == item.Item1) {
                         ViewBag.Headings += "<th><a href='/authors/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
-                            ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort-asc'></a></th>";
+                            ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort-asc'></a></th>";
                     } else {
                         ViewBag.Headings += "<th><a href='/authors/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
-                           ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort'></a></th>";
+                           ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort'></a></th>";
                     }
 
                 } else {
-                    ViewBag.Headings += "<th>" + item.Item3 +"</th>";
+                    ViewBag.Headings += "<th>" + item.Item1 + "</th>";
                 }
             }
             //initial dropdown list size
@@ -95,7 +91,7 @@ namespace LibraryManagement.Controllers {
 
             //filter author with key search
             if (!String.IsNullOrEmpty(key)) {
-                authors = authors.Where(a => (a.id + " " + a.author_name).Contains(key)).OrderBy(a => a.id);
+                authors = authors.Where(a => (a.ID + " " + a.AuthorName).Contains(key)).OrderBy(a => a.ID);
                 ViewBag.searchValue = key;
             }
 
@@ -123,13 +119,13 @@ namespace LibraryManagement.Controllers {
                 _db.Authors.Add(author);
                 _db.SaveChanges();
                 TempData["message"] = $"Add author successfully!";
-                return RedirectToAction("Index", new { key = author.id + " " + author.author_name });
+                return RedirectToAction("Index", new { key = author.ID + " " + author.AuthorName });
             }
             return View();
         }
 
         public ActionResult Edit(int? id) {
-            var author = (from a in _db.Authors where a.id == id select a).SingleOrDefault();
+            var author = (from a in _db.Authors where a.ID == id select a).SingleOrDefault();
             if (id == null || author == null) {
                 TempData["message"] = $"Update fail, Cannot found that Author in system!";
                 TempData["error"] = true;
@@ -144,13 +140,13 @@ namespace LibraryManagement.Controllers {
                 _db.Entry(author).State = EntityState.Modified;
                 _db.SaveChanges();
                 TempData["message"] = $"Update author successfully!";
-                return RedirectToAction("Index", new { key = author.id + " " + author.author_name });
+                return RedirectToAction("Index", new { key = author.ID + " " + author.AuthorName });
             }
             return View(author);
         }
 
         public ActionResult Delete(int? id) {
-            var author = (from a in _db.Authors where a.id == id select a).SingleOrDefault();
+            var author = (from a in _db.Authors where a.ID == id select a).SingleOrDefault();
             if (id == null || author == null) {
                 TempData["message"] = $"Delete fail, Cannot found that Author in system!";
                 TempData["error"] = true;
@@ -158,7 +154,7 @@ namespace LibraryManagement.Controllers {
             }
             _db.Authors.Remove(author);
             _db.SaveChanges();
-            TempData["message"] = $"Delete Author {id} - {author.author_name} successfully!";
+            TempData["message"] = $"Delete Author {id} - {author.AuthorName} successfully!";
             return RedirectToAction("Index");
         }
 
@@ -169,7 +165,7 @@ namespace LibraryManagement.Controllers {
             var authors = from a in _db.Authors
                           select a;
             foreach (var author in authors) {
-                dt.Rows.Add(author.id, author.author_name);
+                dt.Rows.Add(author.ID, author.AuthorName);
             }
             using (XLWorkbook wb = new XLWorkbook()) {
                 wb.Worksheets.Add(dt);
