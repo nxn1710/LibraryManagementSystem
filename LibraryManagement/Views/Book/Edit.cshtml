@@ -3,7 +3,7 @@
     <div class="col-lg-6">
         <div class="panel panel-info">
             <div class="panel-heading">
-                Update Book ID @Model.id
+                Update Book ID @Model.ID
             </div>
             <div class="panel-body">
                 <div class="row">
@@ -13,48 +13,42 @@
                         {
                             @Html.AntiForgeryToken()
                             <div class="form-group">
-                                @Html.HiddenFor(b => b.id)
-                                @Html.LabelFor(b => b.author_id, "Author")
-                                @Html.DropDownListFor(b => b.author_id, (IEnumerable<SelectListItem>)ViewBag.Authors, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(b => b.author_id, null, new { @class = "text-danger" })
+                                @Html.HiddenFor(b => b.ID)
+                                @Html.LabelFor(b => b.AuthorID, "Author")
+                                @Html.DropDownListFor(b => b.AuthorID, (IEnumerable<SelectListItem>)ViewBag.Authors, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(b => b.AuthorID, null, new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
-                                @Html.HiddenFor(b => b.id)
-                                @Html.LabelFor(b => b.category_id, "Category")
-                                @Html.DropDownListFor(b => b.category_id, (IEnumerable<SelectListItem>)ViewBag.Categories, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(b => b.category_id, null, new { @class = "text-danger" })
+                                @Html.LabelFor(b => b.CategoryID, "Category")
+                                @Html.DropDownListFor(b => b.CategoryID, (IEnumerable<SelectListItem>)ViewBag.Categories, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(b => b.CategoryID, null, new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
-                                @Html.HiddenFor(b => b.id)
-                                @Html.LabelFor(b => b.title, "Title")
-                                @Html.TextBoxFor(b => b.title, null, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(b => b.title, null, new { @class = "text-danger" })
+                                @Html.LabelFor(b => b.Title, "Title")
+                                @Html.TextBoxFor(b => b.Title, null, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(b => b.Title, null, new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
-                                @Html.HiddenFor(b => b.id)
-                                @Html.LabelFor(b => b.price, "Price")
-                                @Html.TextBoxFor(b => b.price, null, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(b => b.price, null, new { @class = "text-danger" })
+                                @Html.LabelFor(b => b.Price, "Price")
+                                @Html.TextBoxFor(b => b.Price, null, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(b => b.Price, null, new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
-                                @Html.HiddenFor(b => b.id)
-                                @Html.LabelFor(b => b.available_book, "Available Book")
-                                @Html.TextBoxFor(b => b.available_book, null, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(b => b.available_book, null, new { @class = "text-danger" })
+                                @Html.LabelFor(b => b.AvailableBook, "Available Book")
+                                @Html.TextBoxFor(b => b.AvailableBook, null, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(b => b.AvailableBook, null, new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
-                                @Html.HiddenFor(b => b.id)
-                                @Html.LabelFor(b => b.description, "Description")
-                                @Html.TextAreaFor(b => b.description, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(b => b.description, null, new { @class = "text-danger" })
+                                @Html.LabelFor(b => b.Description, "Description")
+                                @Html.TextAreaFor(b => b.Description, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(b => b.Description, null, new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
-                                @Html.HiddenFor(b => b.id)
-                                @Html.LabelFor(b => b.thumbnail, "Thumbnail")
+                                @Html.LabelFor(b => b.Thumbnail, "Thumbnail")
                                 @*@Html.TextBoxFor(b => b.thumbnail, new { @type = "text",style="display:none",@class = "form-control" })*@
-                                <p id="p-image-contain"><img id="image-contain" src="@Model.thumbnail" style="width: 150px; height: 150px;" alt="Image"></p>
+                                <p id="p-image-contain"><img id="image-contain" src="@Model.Thumbnail" style="width: 150px; height: 150px;" alt="Image"></p>
                                 <input type="file" id="image" name="ImageFile" value="">
-                                @Html.ValidationMessageFor(b => b.thumbnail, null, new { @class = "text-danger" })
+                                @Html.ValidationMessageFor(b => b.Thumbnail, null, new { @class = "text-danger" })
                             </div>
                             <button type="submit" class="btn btn-info">Update</button>
                         }

@@ -57,19 +57,19 @@
                             @foreach (var book in Model)
                             {
                             <tr>
-                                <td>@book.id</td>
-                                <td>@book.title</td>
+                                <td>@book.ID</td>
+                                <td>@book.Title</td>
                                 <td>
-                                    <img src="@book.thumbnail" style="width: 150px; height: 150px">
+                                    <img src="@book.Thumbnail" style="width: 150px; height: 150px">
                                 </td>
-                                <td>@book.price</td>
-                                <td>@book.available_book</td>
-                                <td>@book.description</td>
-                                <td>@book.Author.author_name</td>
-                                <td>@book.BookCategory.category_name</td>
+                                <td>@book.Price</td>
+                                <td>@book.AvailableBook</td>
+                                <td>@book.Description</td>
+                                <td>@book.Author.AuthorName</td>
+                                <td>@book.BookCategory.CategoryName</td>
                                 <td>
-                                    <a href="@Url.Action("Edit","Book",new {id=book.id})" class="btn btn-primary"><i class="fa fa-pencil-square-o"></i> </a>
-                                    <a href="@Url.Action("Delete","Book",new {id=book.id})" onclick="deleteFunction(event, @book.id)" class="btn btn-danger"><i class="fa fa-trash"></i>                                                    </a>
+                                    <a href="@Url.Action("Edit","Book",new {id=book.ID})" class="btn btn-primary"><i class="fa fa-pencil-square-o"></i> </a>
+                                    <a href="@Url.Action("Delete","Book",new {id=book.ID})" onclick="deleteFunction(event, @book.ID)" class="btn btn-danger"><i class="fa fa-trash"></i>                                                    </a>
                                 </td>
                             </tr>
                             }

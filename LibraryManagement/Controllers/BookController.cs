@@ -47,53 +47,15 @@ namespace LibraryManagement.Controllers
             ViewBag.sortProperty = sortProperty;
             ViewBag.currentSize = size;
             var properties = typeof(Book).GetProperties();
-            List<Tuple<string, bool, string>> list = new List<Tuple<string, bool, string>>();
+            List<Tuple<string, bool>> list = new List<Tuple<string, bool>>();
             foreach (var item in properties)
             {
-                var isVirtual = item.GetAccessors()[0].IsVirtual;
-                string nameHeading = "";
-                if (item.Name == "id")
-                {
-                    nameHeading = "Book ID";
-                }
-                if (item.Name == "title")
-                {
-                    nameHeading = "Book Name";
-                }
-                if (item.Name == "thumbnail")
-                {
-                    isVirtual = true;
-                    nameHeading = "Thumbnail";
-                }
-                if (item.Name == "price")
-                {
-                    nameHeading = "Price";
-                }
-                if (item.Name == "available_book")
-                {
-                    nameHeading = "Available Book";
-                }
-                if (item.Name == "description")
-                {
-                    isVirtual = true;
-                    nameHeading = "Description";
-                }
-                if (item.Name == "author_id")
-                {
-                    isVirtual = true;
-                    nameHeading = "Author";
-                }
-
-                if (item.Name == "category_id")
-                {
-                    isVirtual = true;
-                    nameHeading = "Category";
-                }
+                var isVirtual = item.GetAccessors()[0].IsVirtual;                
                 if (item.Name == "Author") { continue; }
                 if (item.Name == "BookCategory") { continue; }
                 if (item.Name == "BorrowedDetails") { continue; }
                 if (item.Name == "ImageFile") { continue; }
-                Tuple<string, bool, string> t = new Tuple<string, bool, string>(item.Name, isVirtual, nameHeading);
+                Tuple<string, bool> t = new Tuple<string, bool>(item.Name, isVirtual);
                 list.Add(t);
             }
             //initial sort heading
@@ -105,23 +67,23 @@ namespace LibraryManagement.Controllers
                     if (sortOrder == "desc" && sortProperty == item.Item1)
                     {
                         ViewBag.Headings += "<th><a href='/book/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
-                       ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort-desc'></i></th></a></th>";
+                       ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort-desc'></i></th></a></th>";
                     }
                     else if (sortOrder == "asc" && sortProperty == item.Item1)
                     {
                         ViewBag.Headings += "<th><a href='/book/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
-                            ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort-asc'></a></th>";
+                            ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort-asc'></a></th>";
                     }
                     else
                     {
                         ViewBag.Headings += "<th><a href='/book/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
-                           ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort'></a></th>";
+                           ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort'></a></th>";
                     }
 
                 }
                 else
                 {
-                    ViewBag.Headings += "<th>" + item.Item3 + "</th>";
+                    ViewBag.Headings += "<th>" + item.Item1 + "</th>";
                 }
             }
             //initial dropdown list size
@@ -154,7 +116,7 @@ namespace LibraryManagement.Controllers
             //filter author with key search
             if (!String.IsNullOrEmpty(key))
             {
-                books = books.Where(a => (a.id + " ").Contains(key)).OrderBy(a => a.id);
+                books = books.Where(a => (a.ID + " ").Contains(key)).OrderBy(a => a.ID);
                 ViewBag.searchValue = key;
             }
 
@@ -180,13 +142,13 @@ namespace LibraryManagement.Controllers
             ViewBag.title = "Books - Add";
             IEnumerable<SelectListItem> categories = _db.BookCategories.Select(c => new SelectListItem
             {
-                Value = c.id.ToString(),
-                Text = c.category_name,
+                Value = c.ID.ToString(),
+                Text = c.CategoryName,
             }).ToList();
             IEnumerable<SelectListItem> authors = _db.Authors.Select(a => new SelectListItem
             {
-                Value = a.id.ToString(),
-                Text = a.author_name,
+                Value = a.ID.ToString(),
+                Text = a.AuthorName,
             }).ToList();
             ViewBag.Categories = categories;
             ViewBag.Authors = authors;
@@ -205,7 +167,7 @@ namespace LibraryManagement.Controllers
                 _db.SaveChanges();
                 ModelState.Clear();
                 TempData["message"] = $"Add book successfully!";
-                return RedirectToAction("Index", new { key = book.id + " "});
+                return RedirectToAction("Index", new { key = book.ID + " "});
             }
             return View();
         }
@@ -213,16 +175,16 @@ namespace LibraryManagement.Controllers
 
         public ActionResult Edit(int? id)
         {
-            var book = (from a in _db.Books where a.id == id select a).SingleOrDefault();
+            var book = (from a in _db.Books where a.ID == id select a).SingleOrDefault();
             IEnumerable<SelectListItem> categories = _db.BookCategories.Select(c => new SelectListItem
             {
-                Value = c.id.ToString(),
-                Text = c.category_name,
+                Value = c.ID.ToString(),
+                Text = c.CategoryName,
             });
             IEnumerable<SelectListItem> authors = _db.Authors.Select(a => new SelectListItem
             {
-                Value = a.id.ToString(),
-                Text = a.author_name,
+                Value = a.ID.ToString(),
+                Text = a.AuthorName,
             });
             ViewBag.Categories = categories;
             ViewBag.Authors = authors;
@@ -242,8 +204,8 @@ namespace LibraryManagement.Controllers
             {
                 if (book.ImageFile == null)
                 {
-                    var oldThumnail = ((from a in _db.Books where a.id == book.id select a).SingleOrDefault()).thumbnail;
-                    book.thumbnail = oldThumnail;
+                    var oldThumnail = ((from a in _db.Books where a.ID == book.ID select a).SingleOrDefault()).Thumbnail;
+                    book.Thumbnail = oldThumnail;
                     book = uploadImage(book);
                 }
                 else {
@@ -252,7 +214,7 @@ namespace LibraryManagement.Controllers
                 }
                 _db.SaveChanges();
                 TempData["message"] = $"Update books successfully!";
-                return RedirectToAction("Index", new { key = book.id + " " });
+                return RedirectToAction("Index", new { key = book.ID + " " });
             }
             return View(book);
         }
@@ -268,7 +230,7 @@ namespace LibraryManagement.Controllers
                         string fileName = Path.GetFileNameWithoutExtension(book.ImageFile.FileName);
                         string extension = Path.GetExtension(book.ImageFile.FileName);
                         fileName += extension;
-                        book.thumbnail = "/UploadedFiles/" + fileName;
+                        book.Thumbnail = "/UploadedFiles/" + fileName;
                         fileName = Path.Combine(Server.MapPath("/UploadedFiles/"), fileName);
                         book.ImageFile.SaveAs(fileName);
                     }
@@ -284,7 +246,7 @@ namespace LibraryManagement.Controllers
 
         public ActionResult Delete(int? id)
         {
-            var book = (from b in _db.Books where b.id == id select b).SingleOrDefault();
+            var book = (from b in _db.Books where b.ID == id select b).SingleOrDefault();
             if (id == null || book == null)
             {
                 TempData["message"] = $"Delete fail, Cannot found that Book in system!";
@@ -293,7 +255,7 @@ namespace LibraryManagement.Controllers
             }
             _db.Books.Remove(book);
             _db.SaveChanges();
-            TempData["message"] = $"Delete Books {id} - {book.title} successfully!";
+            TempData["message"] = $"Delete Books {id} - {book.Title} successfully!";
             return RedirectToAction("Index");
         }
 
@@ -313,7 +275,7 @@ namespace LibraryManagement.Controllers
                         select b;
             foreach (var book in books)
             {
-                dt.Rows.Add(book.id, book.title, book.thumbnail, book.price, book.available_book, book.description, book.author_id, book.category_id);
+                dt.Rows.Add(book.ID, book.Title, book.Thumbnail, book.Price, book.AvailableBook, book.Description, book.AuthorID, book.CategoryID);
             }
             using (XLWorkbook wb = new XLWorkbook())
             {
