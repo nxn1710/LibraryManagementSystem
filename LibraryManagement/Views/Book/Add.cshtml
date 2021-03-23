@@ -17,42 +17,42 @@
                         {
                             @Html.AntiForgeryToken()
                             <div class="form-group">
-                                @Html.LabelFor(b => b.author_id, "Author")
-                                @Html.DropDownListFor(b => b.author_id, (IEnumerable<SelectListItem>)ViewBag.Authors , new { @class = "form-control" })
-                                @Html.ValidationMessageFor(b => b.author_id, null, new { @class = "text-danger" })
+                                @Html.LabelFor(b => b.AuthorID, "Author")
+                                @Html.DropDownListFor(b => b.AuthorID, (IEnumerable<SelectListItem>)ViewBag.Authors , new { @class = "form-control" })
+                                @Html.ValidationMessageFor(b => b.AuthorID, null, new { @class = "text-danger" })
 
                             </div>
                             <div class="form-group">
-                                @Html.LabelFor(b => b.category_id, "Category")
-                                @Html.DropDownListFor(b => b.category_id, (IEnumerable<SelectListItem>)ViewBag.Categories, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(b => b.category_id, null, new { @class = "text-danger" })
+                                @Html.LabelFor(b => b.CategoryID, "Category")
+                                @Html.DropDownListFor(b => b.CategoryID, (IEnumerable<SelectListItem>)ViewBag.Categories, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(b => b.CategoryID, null, new { @class = "text-danger" })
 
                             </div>
                             <div class="form-group">
-                                @Html.LabelFor(b => b.title, "Title")
-                                @Html.TextBoxFor(b => b.title, null, new { @class = "form-control", @placeholder = "Title" })
-                                @Html.ValidationMessageFor(b => b.title, null, new { @class = "text-danger" })
+                                @Html.LabelFor(b => b.Title, "Title")
+                                @Html.TextBoxFor(b => b.Title, null, new { @class = "form-control", @placeholder = "Title" })
+                                @Html.ValidationMessageFor(b => b.Title, null, new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
-                                @Html.LabelFor(b => b.price, "Price")
-                                @Html.TextBoxFor(b => b.price, null, new { @class = "form-control", @placeholder = "Price" })
-                                @Html.ValidationMessageFor(b => b.price, null, new { @class = "text-danger" })
+                                @Html.LabelFor(b => b.Price, "Price")
+                                @Html.TextBoxFor(b => b.Price, null, new { @class = "form-control", @placeholder = "Price" })
+                                @Html.ValidationMessageFor(b => b.Price, null, new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
-                                @Html.LabelFor(b => b.available_book, "Available Book")
-                                @Html.TextBoxFor(b => b.available_book, null, new { @class = "form-control", @placeholder = "Address" })
-                                @Html.ValidationMessageFor(b => b.available_book, null, new { @class = "text-danger" })
+                                @Html.LabelFor(b => b.AvailableBook, "Available Book")
+                                @Html.TextBoxFor(b => b.AvailableBook, null, new { @class = "form-control", @placeholder = "Address" })
+                                @Html.ValidationMessageFor(b => b.AvailableBook, null, new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
-                                @Html.LabelFor(b => b.description, "Description")
-                                @Html.TextAreaFor(b => b.description, new { @class = "form-control", @placeholder = "Description" })
-                                @Html.ValidationMessageFor(b => b.description, null, new { @class = "text-danger" })
+                                @Html.LabelFor(b => b.Description, "Description")
+                                @Html.TextAreaFor(b => b.Description, new { @class = "form-control", @placeholder = "Description" })
+                                @Html.ValidationMessageFor(b => b.Description, null, new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
-                                @Html.LabelFor(b => b.thumbnail, "Thumbnail")
+                                @Html.LabelFor(b => b.Thumbnail, "Thumbnail")
                                 <p id="p-image-contain"><img id="image-contain" src="" style="width: 150px; height: 150px;" alt="Image"></p>
                                 @Html.TextBoxFor(b => b.ImageFile, new { @type = "file", @class = "form-control" })
-                                @Html.ValidationMessageFor(b => b.thumbnail, null, new { @class = "text-danger" })
+                                @Html.ValidationMessageFor(b => b.Thumbnail, null, new { @class = "text-danger" })
                             </div>
                             <button type="submit" class="btn btn-primary">Add Book</button>
                         }

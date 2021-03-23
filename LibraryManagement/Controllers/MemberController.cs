@@ -156,7 +156,7 @@ namespace LibraryManagement.Controllers
 
         public ActionResult Delete(int? id)
         {
-            var member = (from a in _db.Members where a.id == id select a).SingleOrDefault();
+            var member = (from a in _db.Members where a.ID == id select a).SingleOrDefault();
             if (id == null || member == null)
             {                TempData["message"] = $"Delete fail, Cannot found that Member in system!";
                 TempData["error"] = true;
