@@ -24,6 +24,7 @@
           <Property Name="Description" Type="ntext" Nullable="false" />
           <Property Name="AuthorID" Type="int" Nullable="false" />
           <Property Name="CategoryID" Type="int" Nullable="false" />
+
         </EntityType>
         <EntityType Name="BookCategory">
           <Key>

@@ -11,7 +11,9 @@ namespace LibraryManagement.Models
 {
     using System;
     using System.Collections.Generic;
-    
+    using System.ComponentModel.DataAnnotations;
+    using System.Web;
+
     public partial class Book
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
@@ -29,7 +31,34 @@ namespace LibraryManagement.Models
         public int AuthorID { get; set; }
         public int CategoryID { get; set; }
     
+//         public int id { get; set; }
+//         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid full name")]
+//         public string title { get; set; }
+
+//         public string thumbnail { get; set; }
+
+//         //[Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid price")]
+//         //[RegularExpression(@"^\$?(\d{1,3}(\,\d{3})*|(\d+))(\.\d{2})?$", ErrorMessage = "Please enter digit")]
+//         public float price { get; set; }
+//         //[Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid available book")]
+//         //[RegularExpression(@"^[0-9]*$", ErrorMessage = "Please enter digit")]
+//         public int available_book { get; set; }
+//         //[Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid description")]
+//         public string description { get; set; }
+//         [Required]
+
+//         public int author_id { get; set; }
+//         [Required]
+
+//         public int category_id { get; set; }
+
+//         //[Required(ErrorMessage = "Please select file.")]
+//         //[RegularExpression(@"([a-zA-Z0-9\s_\\.\-:])+(.png|.jpg|.gif)$", ErrorMessage = "Only Image files allowed")]
+//         public HttpPostedFileBase ImageFile { get; set; }
+
+//         [Required]
         public virtual Author Author { get; set; }
+        [Required]
         public virtual BookCategory BookCategory { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<BorrowedDetail> BorrowedDetails { get; set; }

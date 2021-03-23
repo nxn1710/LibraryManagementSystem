@@ -11,13 +11,17 @@ using ClosedXML.Excel;
 using LibraryManagement.Models;
 using PagedList;
 using System.Linq.Dynamic;
-namespace LibraryManagement.Controllers {
-    public class MemberController : Controller {
+namespace LibraryManagement.Controllers
+{
+    public class MemberController : Controller
+    {
         private LibraryEntities _db = new LibraryEntities();
         // GET: Member
         [HttpGet]
-        public ActionResult Index(int? page, int? size, string sortProperty, string sortOrder, string key) {
-            ViewBag.title = "Member";
+
+        public ActionResult Index(int? page, int? size, string sortProperty, string sortOrder, string key)
+        {
+            ViewBag.title = "Members";
             if (page == null) page = 1;
             //add sortOrder to view bag
             if (sortOrder == "asc") {
@@ -78,7 +82,7 @@ namespace LibraryManagement.Controllers {
             ViewBag.size = items;
             int pageNumber = (page ?? 1);
             int pageSize = (size ?? 5);
-            //get all members 
+            //get all authors 
             var members = from m in _db.Members
                           select m;
             //check members list is empty
@@ -105,15 +109,19 @@ namespace LibraryManagement.Controllers {
             }
             return View(members.ToPagedList(pageNumber, pageSize));
         }
-        public ActionResult Add() {
+        public ActionResult Add()
+        {
             ViewBag.title = "Members - Add";
+
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Add(Member member) {
-            if (ModelState.IsValid) {
+        public ActionResult Add(Member member)
+        {   
+            if (ModelState.IsValid)
+            {
                 _db.Members.Add(member);
                 _db.SaveChanges();
                 TempData["message"] = $"Add member successfully!";
@@ -134,8 +142,10 @@ namespace LibraryManagement.Controllers {
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Member member) {
-            if (ModelState.IsValid) {
+        public ActionResult Edit(Member member)
+        {
+            if (ModelState.IsValid)
+            {
                 _db.Entry(member).State = EntityState.Modified;
                 _db.SaveChanges();
                 TempData["message"] = $"Update members successfully!";
@@ -144,10 +154,11 @@ namespace LibraryManagement.Controllers {
             return View(member);
         }
 
-        public ActionResult Delete(int? id) {
-            var member = (from a in _db.Members where a.ID == id select a).SingleOrDefault();
-            if (id == null || member == null) {
-                TempData["message"] = $"Delete fail, Cannot found that Member in system!";
+        public ActionResult Delete(int? id)
+        {
+            var member = (from a in _db.Members where a.id == id select a).SingleOrDefault();
+            if (id == null || member == null)
+            {                TempData["message"] = $"Delete fail, Cannot found that Member in system!";
                 TempData["error"] = true;
                 return RedirectToAction("Index");
             }
@@ -157,7 +168,8 @@ namespace LibraryManagement.Controllers {
             return RedirectToAction("Index");
         }
 
-        public FileResult Export() {
+        public FileResult Export()
+        {
             DataTable dt = new DataTable("Grid");
             dt.Columns.AddRange(new DataColumn[4] { new DataColumn("ID"),
                                                      new DataColumn("Full Name"),
@@ -168,11 +180,14 @@ namespace LibraryManagement.Controllers {
                           select m;
             foreach (var member in members) {
                 dt.Rows.Add(member.ID, member.FullName, member.PhoneNumber, member.Address);
+
             }
-            using (XLWorkbook wb = new XLWorkbook()) {
+            using (XLWorkbook wb = new XLWorkbook())
+            {
                 wb.Worksheets.Add(dt);
                 DateTime today = DateTime.Today;
-                using (MemoryStream stream = new MemoryStream()) {
+                using (MemoryStream stream = new MemoryStream())
+                {
                     wb.SaveAs(stream);
                     return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Member {today.ToString("dd/MM/yyyy")}.xlsx");
                 }
