@@ -11,9 +11,11 @@ using ClosedXML.Excel;
 using LibraryManagement.Models;
 using PagedList;
 using System.Linq.Dynamic;
+using System.Data.Entity.Validation;
+
 namespace LibraryManagement.Controllers
 {
-    public class MemberController : Controller
+    public class BookController : Controller
     {
         private LibraryEntities _db = new LibraryEntities();
         // GET: Member
@@ -21,7 +23,7 @@ namespace LibraryManagement.Controllers
 
         public ActionResult Index(int? page, int? size, string sortProperty, string sortOrder, string key)
         {
-            ViewBag.title = "Members";
+            ViewBag.title = "Books";
             if (page == null) page = 1;
             //add sortOrder to view bag
             if (sortOrder == "asc")
@@ -44,7 +46,7 @@ namespace LibraryManagement.Controllers
             }
             ViewBag.sortProperty = sortProperty;
             ViewBag.currentSize = size;
-            var properties = typeof(Member).GetProperties();
+            var properties = typeof(Book).GetProperties();
             List<Tuple<string, bool, string>> list = new List<Tuple<string, bool, string>>();
             foreach (var item in properties)
             {
@@ -52,22 +54,45 @@ namespace LibraryManagement.Controllers
                 string nameHeading = "";
                 if (item.Name == "id")
                 {
-                    nameHeading = "Member ID";
+                    nameHeading = "Book ID";
                 }
-                if (item.Name == "fullname")
+                if (item.Name == "title")
                 {
-                    nameHeading = "Full Name";
+                    nameHeading = "Book Name";
                 }
-                if (item.Name == "phonenumber")
+                if (item.Name == "thumbnail")
                 {
                     isVirtual = true;
-                    nameHeading = "phonenumber";
+                    nameHeading = "Thumbnail";
                 }
-                if (item.Name == "address")
+                if (item.Name == "price")
                 {
-                    nameHeading = "Address";
+                    nameHeading = "Price";
                 }
-                if (item.Name == "Borroweds") { continue; }
+                if (item.Name == "available_book")
+                {
+                    nameHeading = "Available Book";
+                }
+                if (item.Name == "description")
+                {
+                    isVirtual = true;
+                    nameHeading = "Description";
+                }
+                if (item.Name == "author_id")
+                {
+                    isVirtual = true;
+                    nameHeading = "Author";
+                }
+
+                if (item.Name == "category_id")
+                {
+                    isVirtual = true;
+                    nameHeading = "Category";
+                }
+                if (item.Name == "Author") { continue; }
+                if (item.Name == "BookCategory") { continue; }
+                if (item.Name == "BorrowedDetails") { continue; }
+                if (item.Name == "ImageFile") { continue; }
                 Tuple<string, bool, string> t = new Tuple<string, bool, string>(item.Name, isVirtual, nameHeading);
                 list.Add(t);
             }
@@ -116,56 +141,71 @@ namespace LibraryManagement.Controllers
             int pageNumber = (page ?? 1);
             int pageSize = (size ?? 5);
             //get all authors 
-            var members = from m in _db.Members
-                        select m;
+            var books = from b in _db.Books
+                        select b;
             //check authors list is empty
-            if (members.Count() == 0)
+            if (books.Count() == 0)
             {
                 TempData["message"] = $"Not found anything in system!";
                 TempData["error"] = true;
-                return View(members.ToPagedList(pageNumber, pageSize));
+                return View(books.ToPagedList(pageNumber, pageSize));
             }
 
             //filter author with key search
             if (!String.IsNullOrEmpty(key))
             {
-                members = members.Where(a => (a.id + " " + a.fullname).Contains(key)).OrderBy(a => a.id);
+                books = books.Where(a => (a.id + " ").Contains(key)).OrderBy(a => a.id);
                 ViewBag.searchValue = key;
             }
 
             //sort using dynamic linq
             if (sortOrder == "desc")
             {
-                members = members.OrderBy(sortProperty + " desc");
+                books = books.OrderBy(sortProperty + " desc");
             }
             else if (sortOrder == "asc")
             {
-                members = members.OrderBy(sortProperty);
+                books = books.OrderBy(sortProperty);
             }
             else
             {
                 //default is sort by id
-                members = members.OrderBy("id");
+                books = books.OrderBy("id");
             }
-            return View(members.ToPagedList(pageNumber, pageSize));
+            return View(books.ToPagedList(pageNumber, pageSize));
         }
+
         public ActionResult Add()
         {
-            ViewBag.title = "Members - Add";
+            ViewBag.title = "Books - Add";
+            IEnumerable<SelectListItem> categories = _db.BookCategories.Select(c => new SelectListItem
+            {
+                Value = c.id.ToString(),
+                Text = c.category_name,
+            }).ToList();
+            IEnumerable<SelectListItem> authors = _db.Authors.Select(a => new SelectListItem
+            {
+                Value = a.id.ToString(),
+                Text = a.author_name,
+            }).ToList();
+            ViewBag.Categories = categories;
+            ViewBag.Authors = authors;
 
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Add(Member member)
-        {   
+        public ActionResult Add(Book book)
+        {
             if (ModelState.IsValid)
             {
-                _db.Members.Add(member);
+                book = uploadImage(book);
+                _db.Books.Add(book);
                 _db.SaveChanges();
-                TempData["message"] = $"Add member successfully!";
-                return RedirectToAction("Index", new { key = member.id + " " + member.fullname });
+                ModelState.Clear();
+                TempData["message"] = $"Add book successfully!";
+                return RedirectToAction("Index", new { key = book.id + " "});
             }
             return View();
         }
@@ -173,57 +213,107 @@ namespace LibraryManagement.Controllers
 
         public ActionResult Edit(int? id)
         {
-            var member = (from a in _db.Members where a.id == id select a).SingleOrDefault();
-            if (id == null || member == null)
+            var book = (from a in _db.Books where a.id == id select a).SingleOrDefault();
+            IEnumerable<SelectListItem> categories = _db.BookCategories.Select(c => new SelectListItem
             {
-                TempData["message"] = $"Update fail, Cannot found that Members in system!";
+                Value = c.id.ToString(),
+                Text = c.category_name,
+            });
+            IEnumerable<SelectListItem> authors = _db.Authors.Select(a => new SelectListItem
+            {
+                Value = a.id.ToString(),
+                Text = a.author_name,
+            });
+            ViewBag.Categories = categories;
+            ViewBag.Authors = authors;
+            if (id == null || book == null)
+            {
+                TempData["message"] = $"Update fail, Cannot found that Books in system!";
                 TempData["error"] = true;
                 return RedirectToAction("Index");
             }
-            return View(member);
+            return View(book);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Member member)
+        public ActionResult Edit(Book book)
         {
             if (ModelState.IsValid)
             {
-                _db.Entry(member).State = EntityState.Modified;
+                if (book.ImageFile == null)
+                {
+                    var oldThumnail = ((from a in _db.Books where a.id == book.id select a).SingleOrDefault()).thumbnail;
+                    book.thumbnail = oldThumnail;
+                    book = uploadImage(book);
+                }
+                else {
+                    book = uploadImage(book);
+                    _db.Entry(book).State = EntityState.Modified;
+                }
                 _db.SaveChanges();
-                TempData["message"] = $"Update members successfully!";
-                return RedirectToAction("Index", new { key = member.id + " " + member.fullname });
+                TempData["message"] = $"Update books successfully!";
+                return RedirectToAction("Index", new { key = book.id + " " });
             }
-            return View(member);
+            return View(book);
+        }
+
+        public Book uploadImage(Book book)
+        {
+            try
+            {
+                if (Request.Files.Count > 0)
+                {
+                    if (book.ImageFile != null && book.ImageFile.ContentLength > 0)
+                    {
+                        string fileName = Path.GetFileNameWithoutExtension(book.ImageFile.FileName);
+                        string extension = Path.GetExtension(book.ImageFile.FileName);
+                        fileName += extension;
+                        book.thumbnail = "/UploadedFiles/" + fileName;
+                        fileName = Path.Combine(Server.MapPath("/UploadedFiles/"), fileName);
+                        book.ImageFile.SaveAs(fileName);
+                    }
+                }
+                return book;
+            }
+            catch (Exception ex)
+            {
+                ViewBag.message = ex.Message;
+            }
+            return null;
         }
 
         public ActionResult Delete(int? id)
         {
-            var member = (from a in _db.Members where a.id == id select a).SingleOrDefault();
-            if (id == null || member == null)
+            var book = (from b in _db.Books where b.id == id select b).SingleOrDefault();
+            if (id == null || book == null)
             {
-                TempData["message"] = $"Delete fail, Cannot found that Member in system!";
+                TempData["message"] = $"Delete fail, Cannot found that Book in system!";
                 TempData["error"] = true;
                 return RedirectToAction("Index");
             }
-            _db.Members.Remove(member);
+            _db.Books.Remove(book);
             _db.SaveChanges();
-            TempData["message"] = $"Delete Author {id} - {member.fullname} successfully!";
+            TempData["message"] = $"Delete Books {id} - {book.title} successfully!";
             return RedirectToAction("Index");
         }
 
         public FileResult Export()
         {
             DataTable dt = new DataTable("Grid");
-            dt.Columns.AddRange(new DataColumn[4] { new DataColumn("ID"),
-                                                     new DataColumn("Full Name"),
-            new DataColumn("Phone Number"),
-            new DataColumn("Address"),
+            dt.Columns.AddRange(new DataColumn[8] { new DataColumn("id"),
+                                                     new DataColumn("title"),
+            new DataColumn("thumbnail"),
+            new DataColumn("price"),
+            new DataColumn("available_book"),
+            new DataColumn("description"),
+            new DataColumn("author_id"),
+            new DataColumn("category_id"),
             });
-            var members = from m in _db.Members
-                          select m;
-            foreach (var member in members)
+            var books = from b in _db.Books
+                        select b;
+            foreach (var book in books)
             {
-                dt.Rows.Add(member.id, member.fullname, member.phonenumber, member.address);
+                dt.Rows.Add(book.id, book.title, book.thumbnail, book.price, book.available_book, book.description, book.author_id, book.category_id);
             }
             using (XLWorkbook wb = new XLWorkbook())
             {
@@ -232,7 +322,7 @@ namespace LibraryManagement.Controllers
                 using (MemoryStream stream = new MemoryStream())
                 {
                     wb.SaveAs(stream);
-                    return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Member {today.ToString("dd/MM/yyyy")}.xlsx");
+                    return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Book {today.ToString("dd/MM/yyyy")}.xlsx");
                 }
             }
         }
