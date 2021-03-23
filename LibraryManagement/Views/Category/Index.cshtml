@@ -1,34 +1,36 @@
-﻿@model PagedList.IPagedList<LibraryManagement.Models.Author>
+﻿@model PagedList.IPagedList<LibraryManagement.Models.BookCategory>
 @using PagedList.Mvc;
+
 <div class="row">
-    @if (TempData["message"] != null) {
+    @if (TempData["message"] != null)
+    {
         var className = "alert text-center " + (@TempData["error"] != null ? "alert-danger" : "alert-success");
         <p class="@className">
             @TempData["message"]
         </p>
     }
-    <div class="col-sm-12 mb-1">
-        <form action="/Authors/Index" method="GET">
+    <div class="col-sm-9 mb-1">
+        <form action="/Category/Index" method="GET">
             <div class="col-sm-5 pl-0">
                 @Html.TextBox("key", null, new { @class = "form-control input-sm" })
                 @Html.Hidden("sortProperty", (object)ViewBag.sortProperty)
                 @Html.Hidden("sortOrder", (object)ViewBag.sortOrder)
             </div>
             <div class="col-sm-7">
-                <button class="btn btn-primary" type="submit"><i class="fa fa-search" aria-hidden="true"></i> Search</button>
-                @Html.ActionLink("Clear", "Index", "Authors", null, new { @class = "btn btn-default" })
-                <a href="@Url.Action("Add", "Authors")" class="btn btn-success">
+                <input class="btn btn-primary" type="submit" value="Search" />
+                @Html.ActionLink("Clear", "Index", "Category", null, new { @class = "btn btn-default" })
+                <a href="@Url.Action("Add", "Category")" class="btn btn-success">
                     <i class="fa fa-plus"></i>
                     Add New
                 </a>
-                <a href="@Url.Action("Export", "Authors")" class="btn btn-info"><i class="fa fa-download" aria-hidden="true"></i> Export to excel</a>
+                <a href="@Url.Action("Export", "Category")" class="btn btn-info"><i class="fa fa-download" aria-hidden="true"></i> Export to excel</a>
             </div>
         </form>
     </div>
     <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-heading">
-                All Authors in library
+                All Categories in library
             </div>
             <div class="panel-body">
                 <div class="table-responsive">
@@ -40,14 +42,16 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var author in Model) {
+                            @foreach (var category in Model)
+                            {
                                 <tr>
 
-                                    <td>@author.id</td>
-                                    <td> @author.author_name</td>
+                                    <td>@category.id</td>
+                                    <td>@category.category_name</td>
+                                    <td>@category.description</td>
                                     <td>
-                                        <a href="@Url.Action("Edit", "Authors", new {@author.id})" class="btn btn-primary"><i class="fa fa-pencil-square-o"></i> </a>
-                                        <btn onclick="deleteFunction(@author.id)" class="btn btn-danger"><i class="fa fa-trash"></i></btn>
+                                        <a href="@Url.Action("Edit", "Category", new {category.id})" class="btn btn-primary"><i class="fa fa-pencil-square-o"></i> </a>
+                                        <btn onclick="deleteFunction(@category.id)" class="btn btn-danger"><i class="fa fa-trash"></i></btn>
                                     </td>
                                 </tr>
                             }
@@ -66,7 +70,7 @@
                     @Html.DropDownList("size", (List<SelectListItem>)ViewBag.size, new { @class = "form-control", @onchange = "this.form.submit();" })
                 </p>
             }*@
-        <form action="/Authors/Index" method="GET">
+        <form action="/Category/Index" method="GET">
             <p class="m-20" style="width: 75px">
                 @Html.DropDownList("size", (List<SelectListItem>)ViewBag.size, new { @class = "form-control", @onchange = "this.form.submit();" })
                 @Html.Hidden("sortProperty", (object)ViewBag.sortProperty)
@@ -77,7 +81,8 @@
     </div>
     <div class="col-lg-6">
         @Html.PagedListPager(Model, page => Url.Action("Index",
-         new {
+         new
+              {
              page,
              size = ViewBag.currentSize,
              sortProperty = ViewBag.sortProperty,
@@ -88,19 +93,21 @@
 
 </div>
 
+
 <script>
     function deleteFunction(id) {
         var { origin } = window.location;
         swal({
-            title: "Do you want to delete Author " + id + "?",
+            title: "Do you want to delete Category " + id + "?",
             text: "",
             icon: "warning",
             buttons: true,
             dangerMode: true,
-        }).then((willDelete) => {
-            if (willDelete) {
-                window.location = `${origin}/Authors/Delete/${id}`;
-            }
-        });
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    window.location = `${origin}/Category/Delete/${id}`;
+                }
+            });
     }
 </script>

@@ -68,6 +68,7 @@ namespace LibraryManagement.Controllers
                     nameHeading = "Address";
                 }
                 if (item.Name == "Borroweds") { continue; }
+
                 Tuple<string, bool, string> t = new Tuple<string, bool, string>(item.Name, isVirtual, nameHeading);
                 list.Add(t);
             }
@@ -79,24 +80,23 @@ namespace LibraryManagement.Controllers
                 {
                     if (sortOrder == "desc" && sortProperty == item.Item1)
                     {
-                        ViewBag.Headings += "<th><a href='/book/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
-                       ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort-desc'></i></th></a></th>";
+                        ViewBag.Headings += "<th><a href='/member/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +                       ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort-desc'></i></th></a></th>";
                     }
                     else if (sortOrder == "asc" && sortProperty == item.Item1)
                     {
-                        ViewBag.Headings += "<th><a href='/book/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
+                        ViewBag.Headings += "<th><a href='/member/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
                             ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort-asc'></a></th>";
                     }
                     else
                     {
-                        ViewBag.Headings += "<th><a href='/book/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
+                        ViewBag.Headings += "<th><a href='/member/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
                            ViewBag.sortOrder + "&key=" + key + "'>" + item.Item3 + "<i class='fa fa-fw fa-sort'></a></th>";
                     }
 
                 }
                 else
                 {
-                    ViewBag.Headings += "<th>" + item.Item3 + "</th>";
+                    ViewBag.Headings += "<th>"+item.Item3+"</th>";
                 }
             }
             //initial dropdown list size
@@ -117,8 +117,8 @@ namespace LibraryManagement.Controllers
             int pageSize = (size ?? 5);
             //get all authors 
             var members = from m in _db.Members
-                        select m;
-            //check authors list is empty
+                          select m;
+            //check members list is empty
             if (members.Count() == 0)
             {
                 TempData["message"] = $"Not found anything in system!";
@@ -126,7 +126,7 @@ namespace LibraryManagement.Controllers
                 return View(members.ToPagedList(pageNumber, pageSize));
             }
 
-            //filter author with key search
+            //filter member with key search
             if (!String.IsNullOrEmpty(key))
             {
                 members = members.Where(a => (a.id + " " + a.fullname).Contains(key)).OrderBy(a => a.id);
