@@ -9,9 +9,11 @@
         </p>
     }
     <div class="col-sm-9 mb-1">
-        @using (Html.BeginForm("Index", "Staff", FormMethod.Get)) {
+        <form action="/Staff/Index" method="GET">
             <div class="col-sm-5 pl-0">
                 @Html.TextBox("key", null, new { @class = "form-control input-sm" })
+                @Html.Hidden("sortProperty", (object)ViewBag.sortProperty)
+                @Html.Hidden("sortOrder", (object)ViewBag.sortOrder)
             </div>
             <div class="col-sm-7">
                 <input class="btn btn-primary" type="submit" value="Search" />
@@ -20,8 +22,9 @@
                     <i class="fa fa-plus"></i>
                     Add New
                 </a>
+                <a href="@Url.Action("Export", "Staff")" class="btn btn-info"><i class="fa fa-download" aria-hidden="true"></i> Export to excel</a>
             </div>
-        }
+        </form>
     </div>
     <div class="col-lg-12">
         <div class="panel panel-default">
@@ -34,24 +37,22 @@
                            id="dataTables-example">
                         <thead>
                             <tr class="center">
-                                <th>Staff ID</th>
-                                <th>Staff account name</th>
-                                <th>Staff full name</th>
+                                @Html.Raw(ViewBag.Headings)
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var staff in Model) {
-                            <tr>
+                                <tr>
 
-                                <td>@staff.id</td>
-                                <td> @staff.username</td>
-                                <td> @staff.fullname</td>
-                                <td>
-                                    <a href="@Url.Action("Edit", "Staff", new {@staff.id})" class="btn btn-primary"><i class="fa fa-pencil-square-o"></i> </a>
-                                    <a href="@Url.Action("Delete", "Staff", new {@staff.id})" class="btn btn-danger"><i class="fa fa-trash"></i></a>
-                                </td>
-                            </tr>
+                                    <td>@staff.ID</td>
+                                    <td> @staff.Username</td>
+                                    <td> @staff.FullName</td>
+                                    <td>
+                                        <a href="@Url.Action("Edit", "Staff", new {@staff.ID})" class="btn btn-primary"><i class="fa fa-pencil-square-o"></i> </a>
+                                        <button onclick="deleteFunction(@staff.ID)" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                                    </td>
+                                </tr>
                             }
 
                         </tbody>
@@ -61,10 +62,43 @@
         </div>
     </div>
 </div>
-<div class="row" style="text-align: center;">
-
-    Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount
-    @Html.PagedListPager(Model, page => Url.Action("Index",
-        new { page, key = ViewBag.searchValue }))
-
+<div class="row">
+    <div class="col-lg-6">
+        <form action="/Staff/Index" method="GET">
+            <p class="m-20" style="width: 75px">
+                @Html.DropDownList("size", (List<SelectListItem>)ViewBag.size, new { @class = "form-control", @onchange = "this.form.submit();" })
+                @Html.Hidden("sortProperty", (object)ViewBag.sortProperty)
+                @Html.Hidden("sortOrder", (object)ViewBag.sortOrder)
+                @Html.Hidden("key", (object)ViewBag.searchValue)
+            </p>
+        </form>
+    </div>
+    <div class="col-lg-6">
+        @Html.PagedListPager(Model, page => Url.Action("Index",
+              new {
+             page,
+             size = ViewBag.currentSize,
+             sortProperty = ViewBag.sortProperty,
+             sortOrder = ViewBag.sortProperty,
+             key = ViewBag.searchValue
+         }))
+    </div>
 </div>
+
+<script>
+    function deleteFunction(id) {
+        var { origin } = window.location;
+        swal({
+            title: "Do you want to delete Staff " + id + "?",
+            text: "",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    window.location = `${origin}/Staff/Delete/${id}`;
+                }
+            });
+    }
+</script>

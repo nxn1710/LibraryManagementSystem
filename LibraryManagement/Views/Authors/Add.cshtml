@@ -12,9 +12,9 @@
                         @using (Html.BeginForm("Add", "Authors", FormMethod.Post)) {
                             @Html.AntiForgeryToken()
                         <div class="form-group">
-                            @Html.LabelFor(a => a.author_name, "Author Name")
-                            @Html.TextBoxFor(a => a.author_name, null, new { @class = "form-control" })
-                            @Html.ValidationMessageFor(m => m.author_name, null, new {  @class = "text-danger" })
+                            @Html.LabelFor(a => a.AuthorName, "Author Name")
+                            @Html.TextBoxFor(a => a.AuthorName, null, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.AuthorName, null, new {  @class = "text-danger" })
                         </div>
                             <button type="submit" class="btn btn-primary">Add Button</button>
                         }

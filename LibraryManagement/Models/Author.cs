@@ -20,11 +20,10 @@ namespace LibraryManagement.Models
             this.Books = new HashSet<Book>();
         }
     
-        public int id { get; set; }
-
+        public int ID { get; set; }
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid full name")]
         [StringLength(64, MinimumLength = 3, ErrorMessage = "Please length of name must be from 3 to 64 characters")]
-        public string author_name { get; set; }
+        public string AuthorName { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Book> Books { get; set; }

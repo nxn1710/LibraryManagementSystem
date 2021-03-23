@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 using LibraryManagement.Models;
+using LibraryManagement.Commons;
 namespace LibraryManagement.Controllers
 {
     public class LoginController : Controller
@@ -12,21 +13,18 @@ namespace LibraryManagement.Controllers
         private LibraryEntities _db = new LibraryEntities();
         public ActionResult Index()
         {
-            ViewBag.title = "Library Management - Login to system";
-            if (TempData["error"] != null) {
-                ViewBag.error = TempData["error"].ToString();
-            }
             return View();
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Index(string username, string password) {
             if (ModelState.IsValid) {
-                var data = _db.StaffAccounts.Where(s => s.username.Equals(username) && s.password.Equals(password)).ToList();
-                if (data.Count() > 0) {
-                    Session["fullname"] = data.FirstOrDefault().fullname;
-                    Session["username"] = data.FirstOrDefault().username;
-                    return RedirectToAction("Index", "Home", new { area = "" });
+                password = Password.Encrypt(password);
+                 var login = _db.StaffAccounts.Where(s => s.Username.Equals(username) && s.Password.Equals(password)).ToList();
+                if (login.Count() > 0) {
+                    Session["fullname"] = login.FirstOrDefault().FullName;
+                    Session["username"] = login.FirstOrDefault().Username;
+                    return RedirectToAction("Index", "Home", null);
                 } else {
                     TempData["error"] = "Login failed";
                     return RedirectToAction("Index");
