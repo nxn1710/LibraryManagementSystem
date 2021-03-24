@@ -10,7 +10,6 @@ using System.Linq.Dynamic;
 using System.Data;
 using ClosedXML.Excel;
 using System.IO;
-using System.Data.Entity;
 
 namespace LibraryManagement.Controllers {
     [Authorize]
@@ -18,8 +17,9 @@ namespace LibraryManagement.Controllers {
         LibraryEntities _db = new LibraryEntities();
         // GET: Borrows
         [HttpGet]
-        public ActionResult Index(int? page, int? size, string sortProperty, string sortOrder, string key) {
+        public ActionResult Index(int? page, int? size, string sortProperty, string sortOrder, string key, string overdue) {
             ViewBag.title = "Borrows";
+            ViewBag.overdue = overdue;
             if (page == null) page = 1;
             //add sortOrder to view bag
             if (sortOrder == "asc") {
@@ -37,22 +37,27 @@ namespace LibraryManagement.Controllers {
             ViewBag.sortProperty = sortProperty;
             ViewBag.currentSize = size;
             var properties = typeof(Borrowed).GetProperties();
-            List<Tuple<string, bool>> list = new List<Tuple<string, bool>>();
+            List<Tuple<string, bool, int>> list = new List<Tuple<string, bool, int>>();
             foreach (var item in properties) {
                 var isVirtual = item.GetAccessors()[0].IsVirtual;
-                if (item.Name == "MemberID") { isVirtual = true; }
-                if (item.Name == "StaffID") { isVirtual = true; }
-                if (item.Name == "TotalPrice") { isVirtual = true; }
-                if (item.Name == "BorrowedTime") { isVirtual = true; }
-                if (item.Name == "ReturnDeadline") { isVirtual = true; }
-                if (item.Name == "ReturnTime") { isVirtual = true; }
-                if (item.Name == "Return") { isVirtual = true; }
-                if (item.Name == "Member") { continue; }
-                if (item.Name == "StaffAccount") { continue; }
+                int order = 999;
+                if (item.Name == "MemberID") { continue; }
+                if (item.Name == "StaffID") { continue; }
+                if (item.Name == "ID") { order = 1; }
+                if (item.Name == "TotalPrice") { isVirtual = true; order = 4; }
+                if (item.Name == "BorrowedTime") { isVirtual = true; order = 5; }
+                if (item.Name == "ReturnDeadline") { isVirtual = true; order = 6; }
+                if (item.Name == "ReturnTime") { isVirtual = true; order = 7; }
+                if (item.Name == "Return") { isVirtual = true; order = 8; }
+                if (item.Name == "Member") { isVirtual = true; order = 2; }
+                if (item.Name == "StaffAccount") { isVirtual = true; order = 3; }
                 if (item.Name == "BorrowedDetails") { continue; }
-                Tuple<string, bool> t = new Tuple<string, bool>(item.Name, isVirtual);
+                Tuple<string, bool, int> t = new Tuple<string, bool, int>(item.Name, isVirtual, order);
                 list.Add(t);
             }
+
+            list = list.OrderBy(i => i.Item3).ToList();
+
             //initial sort heading
             foreach (var item in list) {
                 //create heading table with non virtual part
@@ -87,17 +92,21 @@ namespace LibraryManagement.Controllers {
             ViewBag.size = items;
             int pageNumber = (page ?? 1);
             int pageSize = (size ?? 5);
-            //get all authors 
-            var borrows = from b in _db.Borroweds
-                          select b;
-            //check authors list is empty
+            //get all borrows 
+            var borrows = (from b in _db.Borroweds
+                              select b);
+            if (overdue == "true") {
+                borrows = borrows.Where(b => b.ReturnDeadline < DateTime.Now);
+            }
+            
+            //check borrows list is empty
             if (borrows.Count() == 0) {
                 TempData["message"] = $"Not found anything in system!";
                 TempData["error"] = true;
                 return View(borrows.ToPagedList(pageNumber, pageSize));
             }
 
-            //filter author with key search
+            //filter borrows with key search
             if (!String.IsNullOrEmpty(key)) {
                 borrows = borrows.Where(a => (a.ID + " ").Contains(key)).OrderBy(a => a.ID);
                 ViewBag.searchValue = key;
@@ -110,7 +119,7 @@ namespace LibraryManagement.Controllers {
                 borrows = borrows.OrderBy(sortProperty);
             } else {
                 //default is sort by id
-                borrows = borrows.OrderBy("id");
+                borrows = borrows.OrderBy("id desc");
             }
             return View(borrows.ToPagedList(pageNumber, pageSize));
         }
@@ -124,6 +133,7 @@ namespace LibraryManagement.Controllers {
                 return RedirectToAction("Index");
             }
             borrow.Return = true;
+            borrow.ReturnTime = DateTime.Now;
             _db.Entry(borrow).State = EntityState.Modified;
             _db.SaveChanges();
             TempData["message"] = $"Confirm Borrow {id} - {borrow.ID} successfully!";
@@ -193,9 +203,10 @@ namespace LibraryManagement.Controllers {
 
         [HttpPost]
         public ActionResult CreateBill(int memberId, DateTime returnDate) {
-            Borrowed borrowed = new Borrowed { MemberID = memberId, StaffID = 9, BorrowedTime = DateTime.Now, ReturnDeadline = returnDate, TotalPrice = 0, Return = false };
+            int staffId;
+            int.TryParse(Request.Cookies["ID"].Value, out staffId);
+            Borrowed borrowed = new Borrowed { MemberID = memberId, StaffID = staffId, BorrowedTime = DateTime.Now, ReturnDeadline = returnDate, TotalPrice = 0, Return = false };
             int numberOfDays = (int)(returnDate - DateTime.Now).TotalDays;
-
             double totalPrice = 0;
             _db.Borroweds.Add(borrowed);
             List<int> listBookIDs = (List<int>)Session["bill"];

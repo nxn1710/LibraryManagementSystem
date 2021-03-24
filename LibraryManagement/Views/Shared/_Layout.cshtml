@@ -50,13 +50,13 @@
                     <a class="dropdown-toggle"
                        data-toggle="dropdown"
                        href="#">
-                        <i class="fa fa-user fa-fw"></i>@Session["username"]
+                        <i class="fa fa-user fa-fw"></i>@Request.Cookies["USERNAME"].Value
                         <b class="caret"></b>
                     </a>
                     <ul class="dropdown-menu dropdown-user">
                         <li>
                             <a href="#">
-                                <i class="fa fa-user fa-fw"></i>@Session["fullname"]
+                                <i class="fa fa-user fa-fw"></i>@Request.Cookies["FULLNAME"].Value
                             </a>
                         </li>
                         <li class="divider"></li>
@@ -93,7 +93,7 @@
                                     <a href="/Borrows/Index">View all borrows</a>
                                 </li>
                                 <li>
-                                    <a href="#">View all overdue borrows</a>
+                                    <a href="/Borrows/Index?overdue=true">View all overdue borrows</a>
                                 </li>
                             </ul>
                             <!-- /.nav-second-level -->

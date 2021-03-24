@@ -3,8 +3,7 @@
 @model PagedList.IPagedList<LibraryManagement.Models.Borrowed>
 @using PagedList.Mvc;
 <div class="row">
-    @if (TempData["message"] != null)
-    {
+    @if (TempData["message"] != null) {
         var className = "alert text-center " + (@TempData["error"] != null ? "alert-danger" : "alert-success");
         <p class="@className">
             @TempData["message"]
@@ -16,6 +15,7 @@
                 @Html.TextBox("key", null, new { @class = "form-control input-sm" })
                 @Html.Hidden("sortProperty", (object)ViewBag.sortProperty)
                 @Html.Hidden("sortOrder", (object)ViewBag.sortOrder)
+                @Html.Hidden("overdue", (object)ViewBag.overdue)
             </div>
             <div class="col-sm-7">
                 <button class="btn btn-primary" type="submit"><i class="fa fa-search" aria-hidden="true"></i> Search</button>
@@ -37,7 +37,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Modal Header</h4>
+                        <h4 class="modal-title">Borrow Details</h4>
                     </div>
                     <div class="modal-body">
                         <table class="table table-striped table-bordered table-hover"
@@ -76,29 +76,29 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var borrow in Model)
-                            {
+                            @foreach (var borrow in Model) {
                                 <tr>
 
                                     <td>@borrow.ID</td>
-                                    <td> @borrow.MemberID</td>
-                                    <td> @borrow.StaffID</td>
+                                    <td> <a href="/Member?key=@borrow.Member.ID @borrow.Member.FullName">@borrow.Member.FullName</a></td>
+                                    <td> @borrow.StaffAccount.FullName</td>
                                     <td> @borrow.TotalPrice</td>
-                                    <td> @borrow.BorrowedTime.ToString("dd MMM yyyy")</td>
-                                    <td> @borrow.ReturnDeadline.ToString("dd MMM yyyy")</td>
-                                    <td >
-                                        @if (borrow.ReturnTime != null)
-                                        {
-                                            @borrow.ReturnTime
+                                    <td> @borrow.BorrowedTime.ToShortDateString()</td>
+                                    <td> @borrow.ReturnDeadline.ToShortDateString()</td>
+                                    <td>
+                                        @(borrow.ReturnTime.HasValue ? @borrow.ReturnTime.Value.ToShortDateString() : "--/--/----")
+                                    </td>
+                                    <td>
+                                        @if (borrow.Return) {
+                                            <i class="fa fa-check-circle text-success fa-2x" aria-hidden="true"></i>
+                                        } else {
+                                            <i class="fa fa-check-circle fa-2x" aria-hidden="true"></i>
                                         }
                                     </td>
-                                    <td> @borrow.Return</td>
 
                                     <td>
-                                        @if (borrow.Return != true)
-                                        {
-                                            <btn onclick="confirmFunction(@borrow.ID)" class="btn btn-danger" id="delete-btnConfirm"><i class="fa fa-trash"></i></btn>
-
+                                        @if (borrow.Return != true) {
+                                            <btn onclick="confirmFunction(@borrow.ID)" class="btn btn-info" id="delete-btnConfirm">Confirm Return</btn>
                                         }
                                         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal" onclick="viewDetailBorrows(@borrow.ID)" id="show-detail">View Detail</button>
                                     </td>
@@ -115,25 +115,26 @@
 
 <div class="row">
     <div class="col-lg-6">
-        <form action="/Authors/Index" method="GET">
+        <form action="/Borrows/Index" method="GET">
             <p class="m-20" style="width: 75px">
                 @Html.DropDownList("size", (List<SelectListItem>)ViewBag.size, new { @class = "form-control", @onchange = "this.form.submit();" })
                 @Html.Hidden("sortProperty", (object)ViewBag.sortProperty)
                 @Html.Hidden("sortOrder", (object)ViewBag.sortOrder)
                 @Html.Hidden("key", (object)ViewBag.searchValue)
+                @Html.Hidden("overdue", (object)ViewBag.overdue)
             </p>
         </form>
     </div>
     <div class="col-lg-6" style="z-index: 0">
         @Html.PagedListPager(Model, page => Url.Action("Index",
-         new
-              {
-             page,
-             size = ViewBag.currentSize,
-             sortProperty = ViewBag.sortProperty,
-             sortOrder = ViewBag.sortProperty,
-             key = ViewBag.searchValue
-         }))
+           new {
+               page,
+               size = ViewBag.currentSize,
+               sortProperty = ViewBag.sortProperty,
+               sortOrder = ViewBag.sortProperty,
+               key = ViewBag.searchValue,
+               overdue = ViewBag.overdue
+           }))
     </div>
 
 </div>
@@ -175,9 +176,9 @@
                 $('#detail-borrow').html(borrow.join(""));
             } else {
                 var waring = 'No books are borrowed';
-                $('#detail-borrow').html(`<td colspan="4">${waring}</td >`).css({ 'text-align': 'center', 'color': 'red', 'font-size': '50px'});
+                $('#detail-borrow').html(`<td colspan="4">${waring}</td >`).css({ 'text-align': 'center', 'color': 'red', 'font-size': '50px' });
             }
-            
+
         });
     }
 </script>
