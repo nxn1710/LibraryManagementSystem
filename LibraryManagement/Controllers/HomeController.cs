@@ -16,7 +16,7 @@ namespace LibraryManagement.Controllers {
             ViewBag.CountBook = countBook;
             var countBorrow = _db.Borroweds.Select(br => br).Count();
             ViewBag.CountBorrow = countBorrow;
-            var overdueBorrows = _db.Borroweds.Where(br => br.ReturnTime > br.ReturnDeadline).Count();
+            var overdueBorrows = _db.Borroweds.Where(br => br.ReturnDeadline < DateTime.Now).Count();
             ViewBag.OverdueBorrows = overdueBorrows;
             return View();
         }
