@@ -14,6 +14,7 @@ using System.Linq.Expressions;
 
 
 namespace LibraryManagement.Controllers {
+    [Authorize]
     public class AuthorsController : Controller {
         private LibraryEntities _db = new LibraryEntities();
         // GET: Authors

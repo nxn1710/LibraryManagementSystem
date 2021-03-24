@@ -26,7 +26,7 @@ namespace LibraryManagement.Models
         public float TotalPrice { get; set; }
         public System.DateTime BorrowedTime { get; set; }
         public System.DateTime ReturnDeadline { get; set; }
-        public System.DateTime ReturnTime { get; set; }
+        public Nullable<System.DateTime> ReturnTime { get; set; }
         public bool Return { get; set; }
     
         public virtual Member Member { get; set; }

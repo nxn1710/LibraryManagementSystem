@@ -24,17 +24,6 @@ namespace LibraryManagement.Models
         public string FullName { get; set; }
         public string PhoneNumber { get; set; }
         public string Address { get; set; }
-
-//         public int id { get; set; }
-//         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid full name")]
-//         [StringLength(64, MinimumLength = 3, ErrorMessage = "Please length of name must be from 3 to 64 characters")]
-//         public string fullname { get; set; }
-//         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid phone")]
-//         [RegularExpression(@"(84|0[1|2|3|4|5|6|7|8|9])+([0-9]{8})", ErrorMessage = "Please length of phone no must be 10 numbers")]
-//         public string phonenumber { get; set; }
-//         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid address")]
-//         [StringLength(128, ErrorMessage = "Only enter 128 characters")]
-//         public string address { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Borrowed> Borroweds { get; set; }
