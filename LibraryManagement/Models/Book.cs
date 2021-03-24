@@ -11,40 +11,44 @@ namespace LibraryManagement.Models
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
     using System.Web;
     using System.Web.Mvc;
 
     public partial class Book
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+       
+    
+        public int ID { get; set; }
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid title")]
+        public string Title { get; set; }
+        public string Thumbnail { get; set; }
+
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid price")]
+        [RegularExpression(@"^\$?(\d{1,3}(\,\d{3})*|(\d+))(\.\d{2})?$", ErrorMessage = "Please enter digit")]
+        public float Price { get; set; }
+
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid available book")]
+        [RegularExpression(@"^[0-9]*$", ErrorMessage = "Please enter digit")]
+        public int AvailableBook { get; set; }
+
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid description")]
+        public string Description { get; set; }
+        [Required]
+        public int AuthorID { get; set; }
+        public IList<SelectListItem> AvailableAuthors { get; set; }
+        [Required]
+        public int CategoryID { get; set; }
+        public IList<SelectListItem> AvailableCategories { get; set; }
+
         public Book()
         {
             this.BorrowedDetails = new HashSet<BorrowedDetail>();
-            //AvailableAuthors = new List<SelectListItem>();
-            //AvailableCategories = new List<SelectListItem>();
+            AvailableAuthors = new List<SelectListItem>();
+            AvailableCategories = new List<SelectListItem>();
         }
-    
-        public int ID { get; set; }
-        public string Title { get; set; }
-      
-        public string Thumbnail { get; set; }
-        //[Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid price")]
-        //[RegularExpression(@"^\$?(\d{1,3}(\,\d{3})*|(\d+))(\.\d{2})?$", ErrorMessage = "Please enter digit")]
-        public float Price { get; set; }
-        //[Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid available book")]
-        //[RegularExpression(@"^[0-9]*$", ErrorMessage = "Please enter digit")]
-        public int AvailableBook { get; set; }
-        //[Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid description")]
-        public string Description { get; set; }
-        //[Required]
-        public int AuthorID { get; set; }
-        //public IList<SelectListItem> AvailableAuthors { get; set; }
-        //[Required]
-        public int CategoryID { get; set; }
-        //public IList<SelectListItem> AvailableCategories { get; set; }
 
-        //[Required(ErrorMessage = "Please select file.")]
-        //[RegularExpression(@"([a-zA-Z0-9\s_\\.\-:])+(.png|.jpg|.gif)$", ErrorMessage = "Only Image files allowed")]
         public HttpPostedFileBase ImageFile { get; set; }
         public virtual Author Author { get; set; }
         public virtual BookCategory BookCategory { get; set; }

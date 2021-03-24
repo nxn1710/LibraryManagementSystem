@@ -12,8 +12,10 @@ using LibraryManagement.Models;
 using PagedList;
 using System.Linq.Dynamic;
 using System.Data.Entity.Validation;
+using System.ComponentModel.DataAnnotations;
 
-namespace LibraryManagement.Controllers {
+namespace LibraryManagement.Controllers
+{
     [Authorize]
     public class BookController : Controller
     {
@@ -50,7 +52,7 @@ namespace LibraryManagement.Controllers {
             foreach (var item in properties)
             {
                 var isVirtual = item.GetAccessors()[0].IsVirtual;
-               
+
                 if (item.Name == "BorrowedDetails") { continue; }
                 if (item.Name == "Author") { continue; }
                 if (item.Name == "BookCategory") { continue; }
@@ -144,8 +146,8 @@ namespace LibraryManagement.Controllers {
 
         public ActionResult Add()
         {
-            //var model = new Book { AvailableAuthors = getAuthors(), AvailableCategories = getCategories() };
-            return View();
+            var model = new Book { AvailableAuthors = getAuthors(), AvailableCategories = getCategories() };
+            return View(model);
         }
 
         [HttpPost]
@@ -161,8 +163,8 @@ namespace LibraryManagement.Controllers {
                 TempData["message"] = $"Add book successfully!";
                 return RedirectToAction("Index", new { key = book.ID + " " });
             }
-            //book.AvailableAuthors = getAuthors();
-            //book.AvailableCategories = getCategories();
+            book.AvailableAuthors = getAuthors();
+            book.AvailableCategories = getCategories();
             return View(book);
         }
 
@@ -170,15 +172,14 @@ namespace LibraryManagement.Controllers {
         public ActionResult Edit(int? id)
         {
             var book = (from a in _db.Books where a.ID == id select a).SingleOrDefault();
-            
             if (id == null || book == null)
             {
                 TempData["message"] = $"Update fail, Cannot found that Books in system!";
                 TempData["error"] = true;
                 return RedirectToAction("Index");
             }
-            //book.AvailableAuthors = getAuthors();
-            //book.AvailableCategories = getCategories();
+            book.AvailableAuthors = getAuthors();
+            book.AvailableCategories = getCategories();
             return View(book);
         }
         [HttpPost]
@@ -187,6 +188,7 @@ namespace LibraryManagement.Controllers {
         {
             if (ModelState.IsValid)
             {
+
                 if (book.ImageFile == null)
                 {
                     var oldThumnail = ((from a in _db.Books where a.ID == book.ID select a).SingleOrDefault()).Thumbnail;
@@ -202,8 +204,8 @@ namespace LibraryManagement.Controllers {
                 TempData["message"] = $"Update books successfully!";
                 return RedirectToAction("Index", new { key = book.ID + " " });
             }
-            //book.AvailableAuthors = getAuthors();
-            //book.AvailableCategories = getCategories();
+            book.AvailableAuthors = getAuthors();
+            book.AvailableCategories = getCategories();
             return View(book);
         }
 
@@ -277,8 +279,9 @@ namespace LibraryManagement.Controllers {
             return null;
         }
 
-        public JsonResult Search(string key) {
-            var books = (from b in _db.Books where b.Title.Contains(key) && b.AvailableBook > 0 select new { b.ID, b.Title, b.Thumbnail, b.Price, b.AvailableBook}).ToList();
+        public JsonResult Search(string key)
+        {
+            var books = (from b in _db.Books where b.Title.Contains(key) && b.AvailableBook > 0 select new { b.ID, b.Title, b.Thumbnail, b.Price, b.AvailableBook }).ToList();
             return Json(books, JsonRequestBehavior.AllowGet);
         }
 
@@ -304,4 +307,3 @@ namespace LibraryManagement.Controllers {
     }
 }
 
-        
