@@ -18,25 +18,23 @@
                             @Html.AntiForgeryToken()
                             <div class="form-group">
                                 @Html.LabelFor(Model => Model.AuthorID, "Author")
-                                @Html.DropDownListFor(Model => Model.AuthorID, Model.AvailableAuthors , new { @class = "form-control" })
-                                @Html.ValidationMessageFor(Model => Model.AuthorID, null, new { @class = "text-danger" })
-
+                                @Html.DropDownListFor(Model => Model.AuthorID, Model.AvailableAuthors, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(Model => Model.AuthorID, "", new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
                                 @Html.LabelFor(Model => Model.CategoryID, "Category")
                                 @Html.DropDownListFor(Model => Model.CategoryID, Model.AvailableCategories, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(Model => Model.CategoryID, null, new { @class = "text-danger" })
-
+                                @Html.ValidationMessageFor(Model => Model.CategoryID, "", new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
                                 @Html.LabelFor(b => b.Title, "Title")
-                                @Html.TextBoxFor(b => b.Title, null, new { @class = "form-control", @placeholder = "Title" })
-                                @Html.ValidationMessageFor(b => b.Title, null, new { @class = "text-danger" })
+                                @Html.TextBoxFor(b => b.Title, "", new { @class = "form-control", @placeholder = "Title" })
+                                @Html.ValidationMessageFor(b => b.Title, "", new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
                                 @Html.LabelFor(b => b.Price, "Price")
-                                @Html.TextBoxFor(b => b.Price, null, new { @class = "form-control", @placeholder = "Price" })
-                                @Html.ValidationMessageFor(b => b.Price, null, new { @class = "text-danger" })
+                                @Html.TextBoxFor(b => b.Price, "", new { @class = "form-control", @placeholder = "Price" })
+                                @Html.ValidationMessageFor(b => b.Price, "", new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
                                 @Html.LabelFor(b => b.AvailableBook, "Available Book")

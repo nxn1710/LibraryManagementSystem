@@ -10,6 +10,14 @@ namespace LibraryManagement.Controllers {
         private LibraryEntities _db = new LibraryEntities();
         public ActionResult Index() {
             ViewBag.Title = "Home Page";
+            var countMember = _db.Members.Select(m => m).Count();
+            ViewBag.CountMember = countMember;
+            var countBook = _db.Books.Select(b => b).Count();
+            ViewBag.CountBook = countBook;
+            var countBorrow = _db.Borroweds.Select(br => br).Count();
+            ViewBag.CountBorrow = countBorrow;
+            var overdueBorrows = _db.Borroweds.Where(br => br.ReturnTime > br.ReturnDeadline).Count();
+            ViewBag.OverdueBorrows = overdueBorrows;
             return View();
         }
     }

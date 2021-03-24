@@ -86,7 +86,12 @@
                                     <td> @borrow.TotalPrice</td>
                                     <td> @borrow.BorrowedTime.ToString("dd MMM yyyy")</td>
                                     <td> @borrow.ReturnDeadline.ToString("dd MMM yyyy")</td>
-                                    <td> @borrow.ReturnTime.ToString("dd MMM yyyy")</td>
+                                    <td >
+                                        @if (borrow.ReturnTime != null)
+                                        {
+                                            @borrow.ReturnTime
+                                        }
+                                    </td>
                                     <td> @borrow.Return</td>
 
                                     <td>
@@ -169,7 +174,8 @@
                 console.log(borrow);
                 $('#detail-borrow').html(borrow.join(""));
             } else {
-                $('#detail-borrow').html('No books are borrowed').css({ 'text-align': 'center', 'color': 'red', 'font-size': '25px'});
+                var waring = 'No books are borrowed';
+                $('#detail-borrow').html(`<td colspan="4">${waring}</td >`).css({ 'text-align': 'center', 'color': 'red', 'font-size': '50px'});
             }
             
         });

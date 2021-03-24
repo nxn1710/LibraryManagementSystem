@@ -16,12 +16,12 @@
                                 @Html.HiddenFor(Model => Model.ID)
                                 @Html.LabelFor(Model => Model.AuthorID, "Author")
                                 @Html.DropDownListFor(Model => Model.AuthorID, Model.AvailableAuthors, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(Model => Model.AuthorID, null, new { @class = "text-danger" })
+                                @Html.ValidationMessageFor(b => b.AuthorID, "", new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
                                 @Html.LabelFor(Model => Model.CategoryID, "Category")
                                 @Html.DropDownListFor(Model => Model.CategoryID, Model.AvailableCategories, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(Model => Model.CategoryID, null, new { @class = "text-danger" })
+                                @Html.ValidationMessageFor(Model => Model.CategoryID, "", new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
                                 @Html.LabelFor(b => b.Title, "Title")
