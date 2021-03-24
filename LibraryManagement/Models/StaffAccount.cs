@@ -30,7 +30,7 @@ namespace LibraryManagement.Models
         [StringLength(64, MinimumLength = 6, ErrorMessage = "Length must be between 6 to 20 characters")]
         public string Password { get; set; }
 
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid password")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid full name")]
         [StringLength(64, MinimumLength = 6, ErrorMessage = "Length must be between 6 to 64 characters")]
         public string FullName { get; set; }
     
