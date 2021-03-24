@@ -20,7 +20,6 @@ namespace LibraryManagement.Controllers
         private LibraryEntities _db = new LibraryEntities();
         // GET: Member
         [HttpGet]
-
         public ActionResult Index(int? page, int? size, string sortProperty, string sortOrder, string key)
         {
             ViewBag.title = "Books";
@@ -50,11 +49,17 @@ namespace LibraryManagement.Controllers
             List<Tuple<string, bool>> list = new List<Tuple<string, bool>>();
             foreach (var item in properties)
             {
-                var isVirtual = item.GetAccessors()[0].IsVirtual;                
+                var isVirtual = item.GetAccessors()[0].IsVirtual;
+               
+                if (item.Name == "BorrowedDetails") { continue; }
                 if (item.Name == "Author") { continue; }
                 if (item.Name == "BookCategory") { continue; }
-                if (item.Name == "BorrowedDetails") { continue; }
                 if (item.Name == "ImageFile") { continue; }
+                if (item.Name == "AvailableAuthors") { continue; }
+                if (item.Name == "AvailableCategories") { continue; }
+                if (item.Name == "AuthorID") { isVirtual = true; }
+                if (item.Name == "CategoryID") { isVirtual = true; }
+                if (item.Name == "Thumbnail") { isVirtual = true; }
                 Tuple<string, bool> t = new Tuple<string, bool>(item.Name, isVirtual);
                 list.Add(t);
             }
@@ -139,20 +144,7 @@ namespace LibraryManagement.Controllers
 
         public ActionResult Add()
         {
-            ViewBag.title = "Books - Add";
-            IEnumerable<SelectListItem> categories = _db.BookCategories.Select(c => new SelectListItem
-            {
-                Value = c.ID.ToString(),
-                Text = c.CategoryName,
-            }).ToList();
-            IEnumerable<SelectListItem> authors = _db.Authors.Select(a => new SelectListItem
-            {
-                Value = a.ID.ToString(),
-                Text = a.AuthorName,
-            }).ToList();
-            ViewBag.Categories = categories;
-            ViewBag.Authors = authors;
-
+            //var model = new Book { AvailableAuthors = getAuthors(), AvailableCategories = getCategories() };
             return View();
         }
 
@@ -167,33 +159,26 @@ namespace LibraryManagement.Controllers
                 _db.SaveChanges();
                 ModelState.Clear();
                 TempData["message"] = $"Add book successfully!";
-                return RedirectToAction("Index", new { key = book.ID + " "});
+                return RedirectToAction("Index", new { key = book.ID + " " });
             }
-            return View();
+            //book.AvailableAuthors = getAuthors();
+            //book.AvailableCategories = getCategories();
+            return View(book);
         }
 
 
         public ActionResult Edit(int? id)
         {
             var book = (from a in _db.Books where a.ID == id select a).SingleOrDefault();
-            IEnumerable<SelectListItem> categories = _db.BookCategories.Select(c => new SelectListItem
-            {
-                Value = c.ID.ToString(),
-                Text = c.CategoryName,
-            });
-            IEnumerable<SelectListItem> authors = _db.Authors.Select(a => new SelectListItem
-            {
-                Value = a.ID.ToString(),
-                Text = a.AuthorName,
-            });
-            ViewBag.Categories = categories;
-            ViewBag.Authors = authors;
+            
             if (id == null || book == null)
             {
                 TempData["message"] = $"Update fail, Cannot found that Books in system!";
                 TempData["error"] = true;
                 return RedirectToAction("Index");
             }
+            //book.AvailableAuthors = getAuthors();
+            //book.AvailableCategories = getCategories();
             return View(book);
         }
         [HttpPost]
@@ -208,7 +193,8 @@ namespace LibraryManagement.Controllers
                     book.Thumbnail = oldThumnail;
                     book = uploadImage(book);
                 }
-                else {
+                else
+                {
                     book = uploadImage(book);
                     _db.Entry(book).State = EntityState.Modified;
                 }
@@ -216,32 +202,9 @@ namespace LibraryManagement.Controllers
                 TempData["message"] = $"Update books successfully!";
                 return RedirectToAction("Index", new { key = book.ID + " " });
             }
+            //book.AvailableAuthors = getAuthors();
+            //book.AvailableCategories = getCategories();
             return View(book);
-        }
-
-        public Book uploadImage(Book book)
-        {
-            try
-            {
-                if (Request.Files.Count > 0)
-                {
-                    if (book.ImageFile != null && book.ImageFile.ContentLength > 0)
-                    {
-                        string fileName = Path.GetFileNameWithoutExtension(book.ImageFile.FileName);
-                        string extension = Path.GetExtension(book.ImageFile.FileName);
-                        fileName += extension;
-                        book.Thumbnail = "/UploadedFiles/" + fileName;
-                        fileName = Path.Combine(Server.MapPath("/UploadedFiles/"), fileName);
-                        book.ImageFile.SaveAs(fileName);
-                    }
-                }
-                return book;
-            }
-            catch (Exception ex)
-            {
-                ViewBag.message = ex.Message;
-            }
-            return null;
         }
 
         public ActionResult Delete(int? id)
@@ -289,69 +252,50 @@ namespace LibraryManagement.Controllers
             }
         }
 
+        public Book uploadImage(Book book)
+        {
+            try
+            {
+                if (Request.Files.Count > 0)
+                {
+                    if (book.ImageFile != null && book.ImageFile.ContentLength > 0)
+                    {
+                        string fileName = Path.GetFileNameWithoutExtension(book.ImageFile.FileName);
+                        string extension = Path.GetExtension(book.ImageFile.FileName);
+                        fileName += extension;
+                        book.Thumbnail = "/UploadedFiles/" + fileName;
+                        fileName = Path.Combine(Server.MapPath("/UploadedFiles/"), fileName);
+                        book.ImageFile.SaveAs(fileName);
+                    }
+                }
+                return book;
+            }
+            catch (Exception ex)
+            {
+                ViewBag.message = ex.Message;
+            }
+            return null;
+        }
 
-
-        //public ActionResult ShowAll(string fullname)
-        //{
-        //    var members = _db.Members.Where(m => m.fullname.StartsWith(fullname) || fullname == null).ToList();
-        //    ViewBag.members = members;
-        //    //var members = (from s in _db.Members select s).ToList();
-        //    //ViewBag.members = members;
-
-        //    return View(members);
-        //}
-
-        //[HttpGet]
-        //public ActionResult Store()
-        //{
-        //    return View();
-        //}
-
-        //[HttpPost]
-        //public ActionResult Store(Member mb)
-        //{
-        //    if (ModelState.IsValid) {
-        //        _db.Members.Add(mb);
-        //        _db.SaveChanges();
-        //        return RedirectToAction("ShowAll");
-        //    }
-        //    ViewBag.message = "Insert member failed!!";
-        //    return View();
-        //}
-
-        //[HttpGet]
-        //public ActionResult Edit(int id)
-        //{
-        //    var memberByID = _db.Members.Where(m => m.id == id).FirstOrDefault();
-        //    return View(memberByID);
-        //}
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Edit([Bind(Include = "id,fullname,phonenumber,address,Update_at")] Member mb)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        var memberByID = _db.Members.Find(mb.id);
-        //        memberByID.fullname = mb.fullname;
-        //        memberByID.phonenumber = mb.phonenumber;
-        //        memberByID.address = mb.address;
-        //        _db.Entry(memberByID).State = EntityState.Modified;
-        //        _db.SaveChanges();
-        //        return RedirectToAction("ShowAll");
-        //    }
-        //    var memberEdit = _db.Members.Where(m => m.id == mb.id).FirstOrDefault();
-        //    return View(memberEdit);
-        //}
-
-        //[HttpGet]
-        //public ActionResult Delete(int? id)
-        //{
-        //    var member = _db.Members.Where(m => m.id == id).First();
-        //    _db.Members.Remove(member);
-        //    _db.SaveChanges();
-        //    return RedirectToAction("ShowAll");
-        //}
-
+        public IList<SelectListItem> getAuthors()
+        {
+            IList<SelectListItem> authors = _db.Authors.Select(a => new SelectListItem
+            {
+                Value = a.ID.ToString(),
+                Text = a.AuthorName,
+            }).ToList();
+            return authors;
+        }
+        public IList<SelectListItem> getCategories()
+        {
+            IList<SelectListItem> categories = _db.BookCategories.Select(a => new SelectListItem
+            {
+                Value = a.ID.ToString(),
+                Text = a.CategoryName,
+            }).ToList();
+            return categories;
+        }
     }
 }
+
+        

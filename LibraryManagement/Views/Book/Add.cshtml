@@ -17,15 +17,15 @@
                         {
                             @Html.AntiForgeryToken()
                             <div class="form-group">
-                                @Html.LabelFor(b => b.AuthorID, "Author")
-                                @Html.DropDownListFor(b => b.AuthorID, (IEnumerable<SelectListItem>)ViewBag.Authors , new { @class = "form-control" })
-                                @Html.ValidationMessageFor(b => b.AuthorID, null, new { @class = "text-danger" })
+                                @Html.LabelFor(Model => Model.AuthorID, "Author")
+                                @Html.DropDownListFor(Model => Model.AuthorID, Model.AvailableAuthors , new { @class = "form-control" })
+                                @Html.ValidationMessageFor(Model => Model.AuthorID, null, new { @class = "text-danger" })
 
                             </div>
                             <div class="form-group">
-                                @Html.LabelFor(b => b.CategoryID, "Category")
-                                @Html.DropDownListFor(b => b.CategoryID, (IEnumerable<SelectListItem>)ViewBag.Categories, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(b => b.CategoryID, null, new { @class = "text-danger" })
+                                @Html.LabelFor(Model => Model.CategoryID, "Category")
+                                @Html.DropDownListFor(Model => Model.CategoryID, Model.AvailableCategories, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(Model => Model.CategoryID, null, new { @class = "text-danger" })
 
                             </div>
                             <div class="form-group">
