@@ -19,6 +19,7 @@
     @Styles.Render("~/Content/css/startmin.css")
     @Styles.Render("~/Content/css/font-awesome.min.css")
     @Styles.Render("~/Content/css/style.css")
+
 </head>
 <body>
     <div id="wrapper">
@@ -49,19 +50,18 @@
                     <a class="dropdown-toggle"
                        data-toggle="dropdown"
                        href="#">
-                        <i class="fa fa-user fa-fw"></i> nxn1710
+                        <i class="fa fa-user fa-fw"></i>@Session["username"]
                         <b class="caret"></b>
                     </a>
                     <ul class="dropdown-menu dropdown-user">
                         <li>
                             <a href="#">
-                                <i class="fa fa-user fa-fw"></i>Nguyễn Xuân
-                                Nghiệp
+                                <i class="fa fa-user fa-fw"></i>@Session["fullname"]
                             </a>
                         </li>
                         <li class="divider"></li>
                         <li>
-                            <a href="login.html">
+                            <a href="/Login/Logout">
                                 <i class="fa fa-sign-out fa-fw"></i>
                                 Logout
                             </a>

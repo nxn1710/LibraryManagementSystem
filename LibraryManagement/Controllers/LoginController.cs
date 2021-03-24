@@ -22,6 +22,7 @@ namespace LibraryManagement.Controllers
                 password = Password.Encrypt(password);
                  var login = _db.StaffAccounts.Where(s => s.Username.Equals(username) && s.Password.Equals(password)).ToList();
                 if (login.Count() > 0) {
+                    FormsAuthentication.SetAuthCookie(username, false);
                     Session["fullname"] = login.FirstOrDefault().FullName;
                     Session["username"] = login.FirstOrDefault().Username;
                     return RedirectToAction("Index", "Home", null);
@@ -33,7 +34,10 @@ namespace LibraryManagement.Controllers
             return View();
         }
 
+        [Authorize]
         public ActionResult LogOut() {
+            Session["fullname"] = null;
+            Session["username"] = null;
             FormsAuthentication.SignOut();
             return RedirectToAction("Index", "Home");
         }

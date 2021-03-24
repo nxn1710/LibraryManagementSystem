@@ -11,7 +11,6 @@ namespace LibraryManagement.Models
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
     using System.Web;
     using System.Web.Mvc;
 
@@ -25,8 +24,7 @@ namespace LibraryManagement.Models
             //AvailableCategories = new List<SelectListItem>();
         }
     
-        public int ID { get; set; } 
-        //[Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid title")]
+        public int ID { get; set; }
         public string Title { get; set; }
       
         public string Thumbnail { get; set; }
@@ -49,7 +47,6 @@ namespace LibraryManagement.Models
         //[RegularExpression(@"([a-zA-Z0-9\s_\\.\-:])+(.png|.jpg|.gif)$", ErrorMessage = "Only Image files allowed")]
         public HttpPostedFileBase ImageFile { get; set; }
         public virtual Author Author { get; set; }
-
         public virtual BookCategory BookCategory { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<BorrowedDetail> BorrowedDetails { get; set; }

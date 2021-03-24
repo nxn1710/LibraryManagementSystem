@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="LibraryModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="LibraryModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Author">
           <Key>
             <PropertyRef Name="ID" />
@@ -24,7 +24,6 @@
           <Property Name="Description" Type="ntext" Nullable="false" />
           <Property Name="AuthorID" Type="int" Nullable="false" />
           <Property Name="CategoryID" Type="int" Nullable="false" />
-
         </EntityType>
         <EntityType Name="BookCategory">
           <Key>
@@ -44,7 +43,7 @@
           <Property Name="TotalPrice" Type="real" Nullable="false" />
           <Property Name="BorrowedTime" Type="datetime" Nullable="false" />
           <Property Name="ReturnDeadline" Type="datetime" Nullable="false" />
-          <Property Name="ReturnTime" Type="datetime" Nullable="false" />
+          <Property Name="ReturnTime" Type="datetime" />
           <Property Name="Return" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="BorrowedDetails">
@@ -220,8 +219,7 @@
             <End Role="BorrowedDetails" EntitySet="BorrowedDetails" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="LibraryModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -268,7 +266,7 @@
           <Property Name="TotalPrice" Type="Single" Nullable="false" />
           <Property Name="BorrowedTime" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ReturnDeadline" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ReturnTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ReturnTime" Type="DateTime" Precision="3" />
           <Property Name="Return" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="Member" Relationship="Self.FK_Borrowed_Member" FromRole="Borrowed" ToRole="Member" />
           <NavigationProperty Name="StaffAccount" Relationship="Self.FK_Borrowed_StaffAccount" FromRole="Borrowed" ToRole="StaffAccount" />
