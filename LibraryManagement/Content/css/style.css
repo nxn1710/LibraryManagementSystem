@@ -37,3 +37,8 @@ text-right {
 .m-20 {
     margin: 20px;
 }
+
+.borrow-panel {
+    border-radius: 1px;
+    border: 1px solid #999;
+}
