@@ -14,6 +14,7 @@ using System.IO;
 
 namespace LibraryManagement.Controllers
 {
+    [Authorize]
     public class StaffController : Controller
     {
         private LibraryEntities _db = new LibraryEntities();

@@ -13,8 +13,8 @@ using PagedList;
 using System.Linq.Dynamic;
 using System.Data.Entity.Validation;
 
-namespace LibraryManagement.Controllers
-{
+namespace LibraryManagement.Controllers {
+    [Authorize]
     public class BookController : Controller
     {
         private LibraryEntities _db = new LibraryEntities();
@@ -287,6 +287,11 @@ namespace LibraryManagement.Controllers
                     return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Book {today.ToString("dd/MM/yyyy")}.xlsx");
                 }
             }
+        }
+
+        public JsonResult Search(string key) {
+            var books = (from b in _db.Books where b.Title.Contains(key) && b.AvailableBook > 0 select new { b.ID, b.Title, b.Thumbnail, b.Price, b.AvailableBook}).ToList();
+            return Json(books, JsonRequestBehavior.AllowGet);
         }
 
 

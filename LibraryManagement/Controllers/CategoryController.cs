@@ -13,6 +13,7 @@ using PagedList;
 using System.Linq.Dynamic;
 
 namespace LibraryManagement.Controllers {
+    [Authorize]
     public class CategoryController : Controller {
         private LibraryEntities _db = new LibraryEntities();
         // GET: Category

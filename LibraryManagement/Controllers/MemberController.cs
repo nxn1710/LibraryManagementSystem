@@ -13,6 +13,7 @@ using PagedList;
 using System.Linq.Dynamic;
 namespace LibraryManagement.Controllers
 {
+    [Authorize]
     public class MemberController : Controller
     {
         private LibraryEntities _db = new LibraryEntities();
@@ -192,6 +193,11 @@ namespace LibraryManagement.Controllers
                     return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Member {today.ToString("dd/MM/yyyy")}.xlsx");
                 }
             }
+        }
+
+        public JsonResult Search(string key) {
+            var members = (from m in _db.Members where (m.ID + " " + m.FullName).Contains(key) select new { m.ID, m.FullName}).ToList();
+            return Json(members, JsonRequestBehavior.AllowGet);
         }
     }
 }

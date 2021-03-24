@@ -12,7 +12,7 @@
 }
 
 .text-center {
-    text-align:center;
+    text-align: center;
 }
 
 .pl-0 {
@@ -22,6 +22,7 @@
 .text-danger {
     color: #dc3545 !important;
 }
+
 .p-1 {
     padding: 10px;
 }
@@ -39,6 +40,17 @@ text-right {
 }
 
 .borrow-panel {
-    border-radius: 1px;
-    border: 1px solid #999;
+    border-radius: 4px;
 }
+
+    .borrow-panel.active {
+        border: 1px solid #66afe9;
+    }
+
+    .borrow-panel li {
+        list-style: none;
+        padding: 10px;
+    }
+        .borrow-panel li:hover {
+            background-color: #ecf0f1;
+        }
