@@ -12,34 +12,25 @@ using ClosedXML.Excel;
 using System.IO;
 using System.Data.Entity;
 
-namespace LibraryManagement.Controllers
-{
+namespace LibraryManagement.Controllers {
     [Authorize]
-    public class BorrowsController : Controller
-    {
+    public class BorrowsController : Controller {
         LibraryEntities _db = new LibraryEntities();
         // GET: Borrows
         [HttpGet]
-        public ActionResult Index(int? page, int? size, string sortProperty, string sortOrder, string key)
-        {
+        public ActionResult Index(int? page, int? size, string sortProperty, string sortOrder, string key) {
             ViewBag.title = "Borrows";
             if (page == null) page = 1;
             //add sortOrder to view bag
-            if (sortOrder == "asc")
-            {
+            if (sortOrder == "asc") {
                 ViewBag.sortOrder = "desc";
-            }
-            else if (sortOrder == "desc")
-            {
+            } else if (sortOrder == "desc") {
                 ViewBag.sortOrder = "";
-            }
-            else
-            {
+            } else {
                 ViewBag.sortOrder = "asc";
             }
             //default sort is sort id
-            if (sortProperty == null)
-            {
+            if (sortProperty == null) {
                 sortProperty = "id";
                 ViewBag.sortOrder = "";
             }
@@ -47,8 +38,7 @@ namespace LibraryManagement.Controllers
             ViewBag.currentSize = size;
             var properties = typeof(Borrowed).GetProperties();
             List<Tuple<string, bool>> list = new List<Tuple<string, bool>>();
-            foreach (var item in properties)
-            {
+            foreach (var item in properties) {
                 var isVirtual = item.GetAccessors()[0].IsVirtual;
                 if (item.Name == "MemberID") { isVirtual = true; }
                 if (item.Name == "StaffID") { isVirtual = true; }
@@ -64,30 +54,21 @@ namespace LibraryManagement.Controllers
                 list.Add(t);
             }
             //initial sort heading
-            foreach (var item in list)
-            {
+            foreach (var item in list) {
                 //create heading table with non virtual part
-                if (!item.Item2)
-                {
-                    if (sortOrder == "desc" && sortProperty == item.Item1)
-                    {
+                if (!item.Item2) {
+                    if (sortOrder == "desc" && sortProperty == item.Item1) {
                         ViewBag.Headings += "<th><a href='/borrow/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
                        ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort-desc'></i></th></a></th>";
-                    }
-                    else if (sortOrder == "asc" && sortProperty == item.Item1)
-                    {
+                    } else if (sortOrder == "asc" && sortProperty == item.Item1) {
                         ViewBag.Headings += "<th><a href='/borrow/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
                             ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort-asc'></a></th>";
-                    }
-                    else
-                    {
+                    } else {
                         ViewBag.Headings += "<th><a href='/borrow/page/" + page + "?size=" + ViewBag.currentSize + "&sortProperty=" + item.Item1 + "&sortOrder=" +
                            ViewBag.sortOrder + "&key=" + key + "'>" + item.Item1 + "<i class='fa fa-fw fa-sort'></a></th>";
                     }
 
-                }
-                else
-                {
+                } else {
                     ViewBag.Headings += "<th>" + item.Item1 + "</th>";
                 }
             }
@@ -100,8 +81,7 @@ namespace LibraryManagement.Controllers
             items.Add(new SelectListItem { Text = "50", Value = "50" });
             items.Add(new SelectListItem { Text = "100", Value = "100" });
             items.Add(new SelectListItem { Text = "200", Value = "200" });
-            foreach (var item in items)
-            {
+            foreach (var item in items) {
                 if (item.Value == size.ToString()) item.Selected = true;
             }
             ViewBag.size = items;
@@ -111,48 +91,34 @@ namespace LibraryManagement.Controllers
             var borrows = from b in _db.Borroweds
                           select b;
             //check authors list is empty
-            if (borrows.Count() == 0)
-            {
+            if (borrows.Count() == 0) {
                 TempData["message"] = $"Not found anything in system!";
                 TempData["error"] = true;
                 return View(borrows.ToPagedList(pageNumber, pageSize));
             }
 
             //filter author with key search
-            if (!String.IsNullOrEmpty(key))
-            {
+            if (!String.IsNullOrEmpty(key)) {
                 borrows = borrows.Where(a => (a.ID + " ").Contains(key)).OrderBy(a => a.ID);
                 ViewBag.searchValue = key;
             }
 
             //sort using dynamic linq
-            if (sortOrder == "desc")
-            {
+            if (sortOrder == "desc") {
                 borrows = borrows.OrderBy(sortProperty + " desc");
-            }
-            else if (sortOrder == "asc")
-            {
+            } else if (sortOrder == "asc") {
                 borrows = borrows.OrderBy(sortProperty);
-            }
-            else
-            {
+            } else {
                 //default is sort by id
                 borrows = borrows.OrderBy("id");
             }
             return View(borrows.ToPagedList(pageNumber, pageSize));
         }
 
-        public ActionResult Add()
-        {
-            return View();
-        }
-
         [HttpGet]
-        public ActionResult Confirm(int? id)
-        {
+        public ActionResult Confirm(int? id) {
             var borrow = (from br in _db.Borroweds where br.ID == id select br).SingleOrDefault();
-            if (id == null || borrow == null)
-            {
+            if (id == null || borrow == null) {
                 TempData["message"] = $"Confirm fail, Cannot found that Borrow in system!";
                 TempData["error"] = true;
                 return RedirectToAction("Index");
@@ -164,18 +130,16 @@ namespace LibraryManagement.Controllers
             return RedirectToAction("Index");
         }
 
-        public JsonResult viewDetail(int bID)
-        {
+        public JsonResult viewDetail(int bID) {
             var detail = _db.BorrowedDetails.Where(br => br.BorrowID == bID).Select(br => new {
                 br.Book.ID,
-               br.Book.Title,
+                br.Book.Title,
                 br.Book.Thumbnail,
                 br.Book.Price,
             }).ToList();
             return Json(detail, JsonRequestBehavior.AllowGet);
         }
-        public FileResult Export()
-        {
+        public FileResult Export() {
             DataTable dt = new DataTable("Grid");
             dt.Columns.AddRange(new DataColumn[8] { new DataColumn("ID"),
                                                      new DataColumn("Member ID"),
@@ -188,21 +152,19 @@ namespace LibraryManagement.Controllers
             });
             var borrows = from b in _db.Borroweds
                           select b;
-            foreach (var borrow in borrows)
-            {
+            foreach (var borrow in borrows) {
                 dt.Rows.Add(borrow.ID, borrow.MemberID, borrow.StaffID, borrow.TotalPrice, borrow.BorrowedTime, borrow.ReturnDeadline, borrow.ReturnTime, borrow.Return);
 
             }
-            using (XLWorkbook wb = new XLWorkbook())
-            {
+            using (XLWorkbook wb = new XLWorkbook()) {
                 wb.Worksheets.Add(dt);
                 DateTime today = DateTime.Today;
-                using (MemoryStream stream = new MemoryStream())
-                {
+                using (MemoryStream stream = new MemoryStream()) {
                     wb.SaveAs(stream);
                     return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Borrows {today.ToString("dd/MM/yyyy")}.xlsx");
                 }
             }
+        }
         public ActionResult Add() {
             Session.Remove("bill");
             string currentDate = DateTime.Now.ToString("MM/dd/yyyy");
