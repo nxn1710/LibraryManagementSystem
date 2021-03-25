@@ -219,7 +219,7 @@ namespace LibraryManagement.Controllers {
             }
             borrowed.TotalPrice = (float)totalPrice;
             _db.SaveChanges();
-            return RedirectToAction("Add");
+            return RedirectToAction("Index", new { key = borrowed.ID });
         }
         private bool isExistInBill(List<int> listBookID, int id) {
             for (int i = 0; i < listBookID.Count; i++) {

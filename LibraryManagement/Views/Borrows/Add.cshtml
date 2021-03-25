@@ -14,7 +14,7 @@
                                 <div class="input-form">
                                     <input name="bookName" placeholder="Book Name" class="form-control" />
                                     <div class="borrow-panel">
-                                       
+
                                     </div>
                                 </div>
                             </div>
@@ -31,7 +31,7 @@
                             <div class="form-group">
                                 <label>Return Date</label>
                                 <div class="input-form">
-                                    <input type="date" name="returnDate" class="form-control"/>
+                                    <input type="date" name="returnDate" class="form-control" />
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-primary">Create Bill</button>
@@ -50,10 +50,10 @@
                 <h4 id="bill-borrower">Borrower: </h4>
                 <h4>Borrowing List:</h4>
                 <ul id="bill-book-list">
-                    
                 </ul>
-                <h4>Borrowing Date: @ViewBag.currentDate</h4>
+                <h4 id="borrowDate">Borrowing Date: @ViewBag.currentDate</h4>
                 <h4 id="return_date">Return date:</h4>
+                <h4 id="total-price">Total Price:</h4>
             </div>
         </div>
     </div>
@@ -61,6 +61,7 @@
 
 <script>
     var today = new Date();
+    let dayBetween;
     var dd = String(today.getDate() + 1).padStart(2, '0');
     var mm = String(today.getMonth() + 1).padStart(2, '0');
     var yyyy = today.getFullYear();
@@ -69,84 +70,103 @@
     inputReturnDate.setAttribute("min", today);
     inputReturnDate.addEventListener("change", function () {
         let day = this.value.split("-");
-        document.getElementById("return_date").innerText = `Return date: ${day[1]}/${day[2]}/${day[0]}`;
-    }); 
-</script>
-
-<script>
-    window.onload = function () {
-        var { origin } = window.location;
-        let bookNameInput = document.querySelector("input[name='bookName'");
-        let memberNameInput = document.querySelector("input[name='memberName'");
-        let memberIdInput = document.querySelector("input[name='memberId'");
-        let borrowPanel = document.getElementsByClassName("borrow-panel");
-        bookNameInput.addEventListener("input", function () {
-            if (this.value != "") {
-                borrowPanel[0].setAttribute("class", "borrow-panel active")
-                fetch(`${origin}/Book/Search?key=${this.value}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        var element = data.map((b) => {
-                            return `<li bookID="${b.ID}">ID: ${b.ID} - Title: ${b.Title}</li>`;
-                        });
-                        borrowPanel[0].innerHTML = element.join("");
-                        addEventBookItem(borrowPanel[0]);
-                    });
-            } else {
-                resetBorrowPanel();
-            }
-        });
-
-        memberNameInput.addEventListener("input", function () {
-            if (this.value != "") {
-                borrowPanel[1].setAttribute("class", "borrow-panel active")
-                fetch(`${origin}/Member/Search?key=${this.value}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(data);
-                        var element = data.map((m) => {
-                            return `<li memberID="${m.ID}" member="${m.FullName}">ID: ${m.ID} - Name: ${m.FullName}</li>`;
-                        });
-                        borrowPanel[1].innerHTML = element.join("");
-                        addEventMemberItem(borrowPanel[1]);                 
-                    });
-            } else {
-                resetBorrowPanel();
-            }
-        });
-
-        function resetBorrowPanel() {
-            borrowPanel[0].innerHTML = "";
-            borrowPanel[0].setAttribute("class", "borrow-panel");
-            borrowPanel[1].innerHTML = "";
-            borrowPanel[1].setAttribute("class", "borrow-panel");
+        let returnDate = `${day[1]}/${day[2]}/${day[0]}`;
+        let borrowDate = `${mm}/${dd - 1}/${yyyy}`;
+        document.getElementById("return_date").innerText = `Return date: ${returnDate}`;
+        dayBetween = datediff(parseDate(borrowDate), parseDate(returnDate));
+        let totalPrice = 0;
+        for (let price of prices) {
+            totalPrice += price * dayBetween;
         }
-        function addEventBookItem(borrowPanel) {
-            borrowPanel.querySelectorAll('li').forEach(item => {
-                item.addEventListener("click", function () {
-                    var title = this.textContent;
-                    $.post(`${origin}/Borrows/AddBookToBill`, { id: this.getAttribute("bookID") })
-                        .done(function (data) {
-                            if (data == "OK") {
-                                document.getElementById("bill-book-list").insertAdjacentHTML("beforeend", `<li><h4>${title}</h4></li>`)
-                                resetBorrowPanel();
-                                bookNameInput.value = "";
-                            }
-                        });
-                })
-            })
-        }
-        function addEventMemberItem(borrowPanel) {
-            borrowPanel.querySelectorAll('li').forEach(item => {
-                item.addEventListener("click", function () {
-                    memberIdInput.value = this.getAttribute("memberID");
-                    memberNameInput.value = this.textContent;
-                    document.getElementById("bill-borrower").innerText = "Borrower: " + this.getAttribute("member");
-                    resetBorrowPanel();
-                })
-            })
-        }
+        document.getElementById("total-price").innerText = `Total Price: ${totalPrice}`;
+    });
+
+    function parseDate(str) {
+        var mdy = str.split('/');
+        console.log(new Date(mdy[2], mdy[0] - 1, mdy[1]));
+        return new Date(mdy[2], mdy[0] - 1, mdy[1]);
     }
+
+    function datediff(first, second) {
+        return Math.round((second - first) / (1000 * 60 * 60 * 24));
+    }
+
+    var { origin } = window.location;
+    let bookNameInput = document.querySelector("input[name='bookName'");
+    let memberNameInput = document.querySelector("input[name='memberName'");
+    let memberIdInput = document.querySelector("input[name='memberId'");
+    let borrowPanel = document.getElementsByClassName("borrow-panel");
+    bookNameInput.addEventListener("input", function () {
+        if (this.value != "") {
+            borrowPanel[0].setAttribute("class", "borrow-panel active")
+            fetch(`${origin}/Book/Search?key=${this.value}`)
+                .then(response => response.json())
+                .then(data => {
+                    var element = data.map((b) => {
+                        return `<li price="${b.Price}" bookID="${b.ID}">ID: ${b.ID} - Title: ${b.Title}</li>`;
+                    });
+                    borrowPanel[0].innerHTML = element.join("");
+                    addEventBookItem(borrowPanel[0]);
+                });
+        } else {
+            resetBorrowPanel();
+        }
+    });
+
+    memberNameInput.addEventListener("input", function () {
+        if (this.value != "") {
+            borrowPanel[1].setAttribute("class", "borrow-panel active")
+            fetch(`${origin}/Member/Search?key=${this.value}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    var element = data.map((m) => {
+                        return `<li memberID="${m.ID}" member="${m.FullName}">ID: ${m.ID} - Name: ${m.FullName}</li>`;
+                    });
+                    borrowPanel[1].innerHTML = element.join("");
+                    addEventMemberItem(borrowPanel[1]);
+                });
+        } else {
+            resetBorrowPanel();
+        }
+    });
+
+    let prices = [];
+
+    function resetBorrowPanel() {
+        borrowPanel[0].innerHTML = "";
+        borrowPanel[0].setAttribute("class", "borrow-panel");
+        borrowPanel[1].innerHTML = "";
+        borrowPanel[1].setAttribute("class", "borrow-panel");
+    }
+    function addEventBookItem(borrowPanel) {
+        borrowPanel.querySelectorAll('li').forEach(item => {
+            item.addEventListener("click", function () {
+                var title = this.textContent;
+                var price = this.getAttribute("price");
+                $.post(`${origin}/Borrows/AddBookToBill`, { id: this.getAttribute("bookID") })
+                    .done(function (data) {
+                        if (data == "OK") {
+                            document.getElementById("bill-book-list").insertAdjacentHTML("beforeend", `<li><h4>${title}</h4></li>`);
+                            prices = [...prices, parseFloat(price)];
+                            resetBorrowPanel();
+                            bookNameInput.value = "";
+                        }
+                    });
+            })
+        })
+    }
+    function addEventMemberItem(borrowPanel) {
+        borrowPanel.querySelectorAll('li').forEach(item => {
+            item.addEventListener("click", function () {
+                memberIdInput.value = this.getAttribute("memberID");
+                memberNameInput.value = this.textContent;
+                document.getElementById("bill-borrower").innerText = "Borrower: " + this.getAttribute("member");
+                resetBorrowPanel();
+            })
+        })
+    }
+
 </script>
 
 <script>
