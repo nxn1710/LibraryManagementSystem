@@ -11,7 +11,8 @@ namespace LibraryManagement.Models
 {
     using System;
     using System.Collections.Generic;
-    
+    using System.ComponentModel.DataAnnotations;
+
     public partial class StaffAccount
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
@@ -21,8 +22,17 @@ namespace LibraryManagement.Models
         }
     
         public int ID { get; set; }
+
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid user name")]
+        [StringLength(64, MinimumLength = 6, ErrorMessage = "Please enter length of user name must be from 6 to 64 characters")]
         public string Username { get; set; }
+
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid password")]
+        [StringLength(64, MinimumLength = 6, ErrorMessage = "Please enter length of password must be from 6 to 64 characters")]
         public string Password { get; set; }
+
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a valid full name")]
+        [StringLength(64, MinimumLength = 6, ErrorMessage = "Please enter length of full name must be from 6 to 64 characters")]
         public string FullName { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
